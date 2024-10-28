@@ -24,7 +24,7 @@ const handleItemClick = () => {
 
 <template>
   <li>
-    <router-link
+    <NuxtLink
       :to="item.route"
       class="group relative flex items-center gap-2 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4"
       @click.prevent="handleItemClick"
@@ -53,7 +53,7 @@ const handleItemClick = () => {
           fill=""
         />
       </svg>
-    </router-link>
+    </NuxtLink>
 
     <!-- Dropdown Menu Start -->
     <div class="translate transform overflow-hidden" v-show="sidebarStore.page === item.label">

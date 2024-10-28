@@ -1,12 +1,19 @@
-<script setup lang="ts">
-import Welcome from './pages/Welcome.vue';
-</script>
+<!-- <script setup lang="ts">
+// import Welcome from './pages/Welcome.vue'
+</script> -->
 
 <template>
-  <div>
-    <p id="electron-status">isElectron: {{ useElectron().isElectron }}</p>
-    <Welcome />
-  </div>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
+  <!-- <div>
+    <template v-if="!authStore.isAuthenticated">
+      <login />
+    </template>
+    <template v-else>
+      
+    </template>
+  </div> -->
 </template>
 
 <style>
@@ -18,3 +25,19 @@ import Welcome from './pages/Welcome.vue';
   font: bold;
 }
 </style>
+
+<script setup lang="ts">
+import { onMounted } from 'vue';
+import { useAuthStore } from '~/stores/auth';
+const authStore = useAuthStore();
+
+onMounted(() => {
+  if (!authStore.isAuthenticated) {
+    navigateTo('/login');
+  }
+});
+definePageMeta({
+  middleware: 'auth'
+  // layout: 'auth'
+});
+</script>

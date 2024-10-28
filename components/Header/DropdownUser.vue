@@ -1,22 +1,40 @@
 <script setup lang="ts">
-import { onClickOutside } from '@vueuse/core'
-import { ref } from 'vue'
+// import { onClickOutside } from '@vueuse/core';
+import { ref } from 'vue';
+// const dropdownOpen = ref(false);
+import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
+import { useAuthStore } from '~/stores/auth'; // import the auth store we just createdconst router = useRouter();
 
-const target = ref(null)
-const dropdownOpen = ref(false)
+const target = ref(null);
 
-onClickOutside(target, () => {
-  dropdownOpen.value = false
-})
+const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
+const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+const logout = () => {
+  logUserOut();
+  router.push('/login');
+};
+// onClickOutside(target, () => {
+//   dropdownOpen.value = false;
+// });
 </script>
 
 <template>
   <div class="relative" ref="target">
-    <router-link
+    <!-- if="authenticated" -->
+    <ul>
+      <!-- <li @click="onClickOutside">click</li> -->
+      <li v-if="true" class="loginBtn" style="float: right">
+        <nuxt-link to="/login">Login</nuxt-link>
+      </li>
+      <li v-else class="loginBtn" style="float: right">
+        <nuxt-link @click="logout">Logout</nuxt-link>
+      </li>
+    </ul>
+    <!-- <router-link
             to="/"
             class="flex items-center gap-3 text-red-400 text-sm font-medium duration-300 ease-in-out hover:text-primary lg:text-base"
-          >
-            <!-- <svg
+          > -->
+    <!-- <svg
               class="fill-current"
               width="22"
               height="22"
@@ -33,7 +51,7 @@ onClickOutside(target, () => {
                 fill=""
               />
             </svg> -->
-            Logout
-          </router-link>
+    <!-- Logout
+          </router-link> -->
   </div>
 </template>
