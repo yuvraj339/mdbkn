@@ -48,7 +48,7 @@
         "perMachine": true,
         "createDesktopShortcut": true,
         "createStartMenuShortcut": true,
-        "shortcutName": "Your App Name"
+        "shortcutName": "MDBKN"
       },
     },
     "win": {
