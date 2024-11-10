@@ -16,8 +16,8 @@
 
 <script setup>
 import categoryTable from '@/components/Rooms/Category/table.vue';
-import { useModalStore } from '@/stores/cetegory';
-const categoryStore = useModalStore();
+import { useCatModalStore } from '@/stores/cetegory';
+const categoryStore = useCatModalStore();
 
 // function addCategory() {
 //   categoryStore.toggleModal();

@@ -23,7 +23,7 @@
         <thead>
           <tr>
             <th v-for="header in headers" :key="header" @click="sortBy(header.key)" class="text-xs">
-              <button class="px-4 py-2 text-left" v-if="header.key != 'actions'">
+              <button class="py-2 text-left" v-if="header.key != 'actions'">
                 {{ header.label }}
                 <span v-if="sortKey === header.key">{{ sortOrder === 'asc' ? '↑' : '↓' }}</span>
               </button>
@@ -62,22 +62,28 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watchEffect } from 'vue';
+import { useFetchData } from '@/composables/fetchData';
 
 // Data properties
-const records = ref([]);
+// const records = ref([]);
 const search = ref('');
 const perPage = ref(10);
 const currentPage = ref(1);
 const sortKey = ref(null);
 const sortOrder = ref(null);
-const error = ref(null);
+// const error = ref(null);
 const props = defineProps({
   headers: Array,
   apiURL: String,
   store: Object
 });
 
+const { records, fetchData, error } = useFetchData(props.apiURL);
+
+watchEffect(() => {
+  records.value; // Watch for changes
+});
 const editRecord = async (data) => {
   console.log(JSON.parse(JSON.stringify(data)));
   props.store.setRecord(JSON.parse(JSON.stringify(data)));
@@ -97,21 +103,25 @@ const deleteRecord = async (id) => {
   if (error.value) {
     alert('Failed to delete record: ' + props.apiURL);
   } else {
+    fetchData();
     alert('Record deleted successfully!');
   }
 };
 
-onMounted(async () => {
-  try {
-    const { data } = await useFetch(props.apiURL);
-    console.log(data);
-    records.value = data.value['rows'];
-  } catch (err) {
-    error.value = err.message;
-    console.error('Error fetching records:', err);
-  }
+// async function fetchData() {
+//   try {
+//     const { data } = await useFetch(props.apiURL);
+//     records.value = data.value['rows'];
+//   } catch (err) {
+//     error.value = err.message;
+//     console.error('Error fetching records:', err);
+//   }
+// }
+
+onMounted(() => {
+  fetchData(); // Initial fetch when component mounts
 });
-const perPageOptions = [1, 5, 10, 15, 20];
+const perPageOptions = [5, 10, 15, 20];
 
 // Computed properties
 const filteredRecords = computed(() => {

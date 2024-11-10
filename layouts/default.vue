@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import HeaderArea from '@/components/Header/HeaderArea.vue'
 // import SidebarArea from '@/components/Sidebar/SidebarArea.vue'
-import addCategoryForm from '@/components/Rooms/Category/add.vue';
+// import addCategoryForm from '@/components/Rooms/Category/add.vue';
 </script>
 
 <template>
@@ -24,7 +24,8 @@ import addCategoryForm from '@/components/Rooms/Category/add.vue';
           <!-- <NuxtPage /> -->
         </div>
         <!-- Addding all model popup -->
-        <addCategoryForm />
+
+        <BookingsAdd />
       </main>
       <!-- ===== Main Content End ===== -->
     </div>

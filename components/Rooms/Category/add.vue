@@ -1,21 +1,17 @@
 <template>
   <div>
     <!-- Add Room Category Modal -->
-    <div v-if="categoryStore.showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div v-if="categoryStore.showModal" id="roomCategoryadd" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div class="bg-white p-6 rounded-lg w-96 modal">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-semibold">{{ categoryStore.editMode ? 'Edit Room Category' : 'Add Room Category' }}</h2>
           <button @click="categoryStore.closeModel()">✖️</button>
         </div>
-        {{ categoryStore.record }}
+        <!-- {{ categoryStore.record }} -->
         <div class="space-y-4">
           <div>
             <label class="block">Name:</label>
             <input v-model="categoryStore.record.name" type="text" class="w-full border rounded px-3 py-1" />
-          </div>
-          <div>
-            <label class="block">Facility:</label>
-            <input v-model="categoryStore.record.facility" type="text" class="w-full border rounded px-3 py-1" />
           </div>
           <div>
             <label class="block">Description:</label>
@@ -28,6 +24,10 @@
           <div>
             <label class="block">Patient Rent:</label>
             <input v-model="categoryStore.record.patientRent" type="number" class="w-full border rounded px-3 py-1" />
+          </div>
+          <div>
+            <label class="block">Max Occupancy:</label>
+            <input v-model="categoryStore.record.max_occupancy" type="number" class="w-full border rounded px-3 py-1" />
           </div>
         </div>
 
@@ -42,28 +42,32 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { useFetch } from '#app'
-import { useModalStore } from '@/stores/cetegory'
+// import { reactive } from 'vue';
+import { useFetch } from '#app';
+import { useCatModalStore } from '@/stores/cetegory';
+import { useFetchData } from '@/composables/fetchData';
 
-const categoryStore = useModalStore()
+const { records, fetchData } = useFetchData('/api/rooms/category');
+
+const categoryStore = useCatModalStore();
 
 // let newRoom = reactive(categoryStore.record)
 
 async function saveRoomCategory() {
-  const { name, facility, description, normalRent, patientRent } = categoryStore.record
-  categoryStore.editMode = false
+  // const { name, description, normalRent, patientRent } = categoryStore.record;
+  categoryStore.editMode = false;
   // Call the backend to save data
   const { data, error } = await useFetch('/api/rooms/category', {
     method: 'POST',
-    body: { name, facility, description, normalRent, patientRent }
-  })
+    body: categoryStore.record
+  });
 
   if (error.value) {
-    alert('Failed to save category')
+    alert('Failed to save category');
   } else {
-    alert('Room category added successfully!')
-    categoryStore.closeModel()
+    await fetchData();
+    alert('Room category added successfully!');
+    categoryStore.closeModel();
     // Reset form fields
     // newRoom = {
     //   name: '',
@@ -80,16 +84,16 @@ async function updateRoomCategory() {
     method: 'PUT',
     body: JSON.stringify(categoryStore.record),
     headers: { 'Content-Type': 'application/json' }
-  })
+  });
 
   if (error.value) {
-    alert('Failed to update record')
+    alert('Failed to update record');
   } else {
-    alert('Record updated successfully')
+    alert('Record updated successfully');
   }
 
-  categoryStore.setEditMode(false)
-  categoryStore.closeModel()
+  categoryStore.setEditMode(false);
+  categoryStore.closeModel();
 }
 </script>
 

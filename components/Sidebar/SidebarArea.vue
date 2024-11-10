@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { useSidebarStore } from '@/stores/sidebar'
-import { onClickOutside } from '@vueuse/core'
-import { ref } from 'vue'
-import SidebarItem from './SidebarItem.vue'
+import { useSidebarStore } from '@/stores/sidebar';
+import { onClickOutside } from '@vueuse/core';
+import { ref } from 'vue';
+import SidebarItem from './SidebarItem.vue';
 
-const target = ref(null)
+const target = ref(null);
 
-const sidebarStore = useSidebarStore()
+const sidebarStore = useSidebarStore();
 
 onClickOutside(target, () => {
-  sidebarStore.isSidebarOpen = false
-})
+  sidebarStore.isSidebarOpen = false;
+});
 
 const menuGroups = ref([
   {
@@ -165,7 +165,7 @@ const menuGroups = ref([
                   />
                 </svg>`,
         label: 'Hospitals',
-        route: '/hospitals'
+        route: '#'
         // children: [{ label: 'eCommerce', route: '/' }]
       },
       {
@@ -237,7 +237,7 @@ const menuGroups = ref([
       // },
     ]
   }
-])
+]);
 </script>
 
 <template>

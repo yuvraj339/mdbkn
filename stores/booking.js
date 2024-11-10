@@ -1,10 +1,32 @@
 import { defineStore } from 'pinia';
-var records = { floorNumber: '', roomNumber: '', roomCategory: 1, price: '', amenities: '', guestCapacity: '', roomStatus: '', remarks: '' };
-export const useRoomModalStore = defineStore('roomModal', {
+// import { ref } from 'vue';
+var records = {
+  patientType: '',
+  bookingType: '',
+  checkInTime: '',
+  checkOutTime: '',
+  category: '',
+  room: '',
+  payment: '',
+  mobile: '',
+  guestName: '',
+  patientGuestRelation: '',
+  document: File,
+  gender: '',
+  caste: '',
+  age: '',
+  state: '',
+  city: '',
+  patientName: '',
+  hospital: '',
+  wardNo: '',
+  remark: ''
+};
+export const useBookingModalStore = defineStore('modalBooking', {
   state: () => ({
     showModal: false,
     editMode: false,
-    record: ref(records),
+    record: records,
     editId: null
   }),
   actions: {
@@ -14,9 +36,7 @@ export const useRoomModalStore = defineStore('roomModal', {
     closeModel() {
       this.showModal = false;
       this.editMode = false;
-      // let data = records;
-      // let data = records.push({ id: null });
-      this.record = ref(records);
+      this.record = records;
       // this.setRecord(data);
     },
     setRecord(data) {

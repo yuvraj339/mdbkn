@@ -26,7 +26,7 @@ const logout = () => {
         <nuxt-link to="/login">Login</nuxt-link>
       </li>
       <li v-else class="loginBtn p-5" style="float: right">
-        <span class="mr-2">Hello {{ authStore.user.name }}, </span>
+        <span class="mr-2" v-if="authStore.user">Hello {{ authStore.user?.name }}, </span>
         <span class="text-red-600 font-bold cursor-pointer"><nuxt-link @click="logout()">Logout</nuxt-link></span>
       </li>
     </ul>

@@ -42,6 +42,8 @@ const handleLogin = () => {
       } else {
         authStore.authenticateUser(response.auth);
         authStore.currentUser(response.user);
+        // localstorage.setItem('isAuthenticated', JSON.stringify(response.auth));
+        // localstorage.setItem('user', JSON.stringify(response.user));
         router.push('/');
       }
     })

@@ -3,34 +3,46 @@ import { defineStore } from 'pinia';
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isAuthenticated: false,
-    user: undefined
+    user: undefined,
+    record: { name: '', mobile: '', email: '', password: '' }
   }),
   actions: {
     authenticateUser(status) {
       this.isAuthenticated = status;
+      this.setLocalStorage();
     },
     currentUser(user) {
       this.user = user;
-      this.setLocalstorage();
+      this.setLocalStorage();
     },
     logout() {
       this.authenticateUser(false);
       this.user = undefined;
-      this.setLocalstorage();
+      // this.setLocalStorage();
+      localStorage.setItem('isAuthenticated', JSON.stringify(false));
+      localStorage.setItem('user', undefined);
     },
-    setLocalstorage() {
-      // localstorage.setItem('isAuthenticated', JSON.stringify(this.isAuthenticated));
-      // localstorage.setItem('user', JSON.stringify(user));
-    }
-    // loadAuthState() {
-    //   if (process.client) {
-    //     // Retrieve stored authentication state when available in the client
-    //     const auth = JSON.parse(localStorage.getItem('isAuthenticated'));
-    //     const user = JSON.parse(localStorage.getItem('currentUser'));
+    setLocalStorage() {
+      // if (process.client) {
+      // Ensures this only runs on the client side
+      localStorage.setItem('isAuthenticated', JSON.stringify(this.isAuthenticated));
+      localStorage.setItem('user', JSON.stringify(this.user));
+      // }
+    },
+    updateOnReload() {
+      let auth = JSON.parse(localStorage.getItem('isAuthenticated'));
+      let localStUser = localStorage.getItem('user');
+      let user = JSON.parse(localStUser);
 
-    //     if (auth) this.isAuthenticated = auth;
-    //     if (user) this.currentUser = user;
-    //   }
-    // }
+      if (auth) {
+        this.isAuthenticated = auth;
+      }
+      this.user = user;
+      if (user) {
+        this.record.name = user.name;
+        this.record.mobile = user.mobile;
+        this.record.email = user.email;
+      }
+    }
   }
 });

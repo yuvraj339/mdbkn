@@ -32,6 +32,7 @@ import { useAuthStore } from '~/stores/auth';
 const authStore = useAuthStore();
 
 onMounted(() => {
+  authStore.updateOnReload();
   if (!authStore.isAuthenticated) {
     navigateTo('/login');
   }

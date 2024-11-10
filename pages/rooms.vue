@@ -6,7 +6,7 @@
       <div class="flex space-x-4">
         <!-- <button @click="exportData('pdf')" class="btn btn-primary">Export PDF</button>
           <button @click="exportData('excel')" class="btn btn-primary">Export Excel</button> -->
-        <button @click="add" class="btn btn-primary">Add Room +</button>
+        <button @click="roomStore.toggleModal()" class="btn btn-primary">Add Room +</button>
       </div>
     </div>
 
@@ -15,13 +15,13 @@
 </template>
 
 <script setup lang="ts">
-import RoomTable from '@/components/Rooms/table.vue'
-import { useModalStore } from '@/stores/room'
-const Store = useModalStore()
+import RoomTable from '@/components/Rooms/table.vue';
+import { useRoomModalStore } from '@/stores/room';
+const roomStore = useRoomModalStore();
 
-function add() {
-  Store.toggleModal()
-}
+// function add() {
+//   Store.toggleModal();
+// }
 
 // function exportData(format) {
 //     alert(`Exporting as ${format}`)
