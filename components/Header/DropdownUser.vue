@@ -3,19 +3,18 @@
 import { ref } from 'vue';
 // const dropdownOpen = ref(false);
 import { storeToRefs } from 'pinia'; // import storeToRefs helper hook from pinia
-import { useAuthStore } from '~/stores/auth'; // import the auth store we just createdconst router = useRouter();
 
 const target = ref(null);
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from '#app';
 
-const { logUserOut } = useAuthStore(); // use authenticateUser action from  auth store
-const { authenticated } = storeToRefs(useAuthStore()); // make authenticated state reactive with storeToRefs
+const authStore = useAuthStore();
+const router = useRouter();
+
 const logout = () => {
-  logUserOut();
+  authStore.logout();
   router.push('/login');
 };
-// onClickOutside(target, () => {
-//   dropdownOpen.value = false;
-// });
 </script>
 
 <template>
@@ -23,11 +22,12 @@ const logout = () => {
     <!-- if="authenticated" -->
     <ul>
       <!-- <li @click="onClickOutside">click</li> -->
-      <li v-if="true" class="loginBtn" style="float: right">
+      <li v-if="!authStore.isAuthenticated" class="loginBtn" style="float: right">
         <nuxt-link to="/login">Login</nuxt-link>
       </li>
-      <li v-else class="loginBtn" style="float: right">
-        <nuxt-link @click="logout">Logout</nuxt-link>
+      <li v-else class="loginBtn p-5" style="float: right">
+        <span class="mr-2">Hello {{ authStore.user.name }}, </span>
+        <span class="text-red-600 font-bold cursor-pointer"><nuxt-link @click="logout()">Logout</nuxt-link></span>
       </li>
     </ul>
     <!-- <router-link
