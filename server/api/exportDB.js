@@ -6,7 +6,8 @@ import path from 'path';
 export default defineEventHandler(async (event) => {
   try {
     // Path to the SQLite database file
-    const dbPath = path.resolve('.data/db.sqlite'); // Adjust to your actual path
+    // const dbPath = path.resolve('.data/db.sqlite'); // Adjust to your actual path
+    const dbPath = path.join(process.resourcesPath, 'resources', 'db.sqlite');
 
     // Check if the database file exists
     if (!fs.existsSync(dbPath)) {
