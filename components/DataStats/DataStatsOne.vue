@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 const cardItems = ref([
   {
@@ -21,7 +21,7 @@ const cardItems = ref([
           />
         </svg>`,
     title: 'Current Bookings',
-    total: '$3.456K',
+    total: '$3.456K'
     //growthRate: 0.43
   },
   {
@@ -43,7 +43,7 @@ const cardItems = ref([
           />
         </svg>`,
     title: 'Room Database',
-    total: '$45,2K',
+    total: '$45,2K'
     //growthRate: 4.35
   },
   {
@@ -65,7 +65,7 @@ const cardItems = ref([
           />
         </svg>`,
     title: 'Today Booking',
-    total: '2.450',
+    total: '2.450'
     //growthRate: 2.59
   },
   {
@@ -87,7 +87,7 @@ const cardItems = ref([
           />
         </svg>`,
     title: 'Room Booked',
-    total: '3.456',
+    total: '3.456'
     //growthRate: -0.95
   },
   {
@@ -108,8 +108,8 @@ const cardItems = ref([
             fill=""
           />
         </svg>`,
-    title: 'Today\'s Checkout',
-    total: '2.450',
+    title: "Today's Checkout",
+    total: '2.450'
     //growthRate: 2.59
   },
   {
@@ -131,23 +131,16 @@ const cardItems = ref([
           />
         </svg>`,
     title: 'Due Balance',
-    total: '3.456',
+    total: '3.456'
     //growthRate: -0.95
   }
-])
+]);
 </script>
 
 <template>
   <!-- Card Item Start -->
-  <div
-    v-for="(item, index) in cardItems"
-    :key="index"
-    class="rounded-sm border border-stone-100 bg-white py-6 px-7 shadow-xl dark:border-strokedark dark:bg-boxdark"
-  >
-    <div
-      class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-400 dark:bg-meta-4"
-      v-html="item.icon"
-    ></div>
+  <div v-for="(item, index) in cardItems" :key="index" class="rounded-sm border border-stone-100 bg-white py-6 px-7 shadow-xl dark:border-strokedark dark:bg-boxdark">
+    <div class="flex h-11 w-11 items-center justify-center rounded-full bg-slate-400 dark:bg-meta-4" v-html="item.icon"></div>
 
     <div class="mt-4 flex items-end justify-between">
       <div>

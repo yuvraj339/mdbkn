@@ -1,8 +1,13 @@
 import fs from 'fs';
 import path from 'path';
 
+const db = useDatabase('mdbkn');
+
+function updateRoomStatus(roomID, status) {
+  const updateRoomStmt = db.prepare('UPDATE rooms SET roomStatus = ? WHERE id = ?');
+  updateRoomStmt.run(status, roomID);
+}
 export default defineEventHandler(async (event) => {
-  const db = useDatabase('mdbkn');
   const id = event.context.params?.id;
 
   if (event.node.req.method === 'POST' && id) {
@@ -34,6 +39,8 @@ export default defineEventHandler(async (event) => {
     // Retrieve existing record to preserve values for missing fields
     const existingRecord = await db.prepare(`SELECT * FROM bookings WHERE id = ?`).get(id);
 
+    updateRoomStatus(existingRecord.room, 'Available');
+    updateRoomStatus(fields.room, 'Unavailable');
     // Check if the record exists
     if (!existingRecord) {
       return { success: false, message: 'Record not found' };
@@ -92,12 +99,15 @@ export default defineEventHandler(async (event) => {
       updatedFields.remark,
       id
     );
-    console.log('result', result);
+    // console.log('result', result);
     return result.success > 0 ? { success: true, message: 'Record updated successfully' } : { success: false, message: 'Update failed' };
   }
   // Get the ID from the route parameter
 
   if (event.node.req.method === 'DELETE') {
+    const existingRecord = await db.prepare(`SELECT * FROM bookings WHERE id = ?`).get(id);
+    updateRoomStatus(existingRecord.room, 'Available');
+
     const statement = db.prepare(`DELETE FROM bookings WHERE id = ?`);
     const result = statement.run(id);
 

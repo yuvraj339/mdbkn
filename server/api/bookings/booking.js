@@ -1,9 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 
-export default defineEventHandler(async (event) => {
-  const db = useDatabase('mdbkn');
+const db = useDatabase('mdbkn');
 
+function updateRoomStatus(roomID, status) {
+  const updateRoomStmt = db.prepare('UPDATE rooms SET roomStatus = ? WHERE id = ?');
+  updateRoomStmt.run(status, roomID);
+}
+
+export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
     const { rows } = await db.sql`SELECT * FROM bookings`;
 
@@ -60,10 +65,11 @@ export default defineEventHandler(async (event) => {
         }
       }
     }
-
     // Convert fields with integer types
     fields.room = parseInt(fields.room, 10);
     fields.age = parseInt(fields.age, 10);
+
+    updateRoomStatus(fields.room, 'Unavailable');
 
     // Log fields and upload path to confirm data parsing
     // console.log('Parsed Fields:', fields);
