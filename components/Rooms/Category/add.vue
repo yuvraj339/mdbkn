@@ -50,7 +50,9 @@ import { useFetchData } from '@/composables/fetchData';
 const { records, fetchData } = useFetchData('/api/rooms/category');
 
 const categoryStore = useCatModalStore();
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 // let newRoom = reactive(categoryStore.record)
 
 async function saveRoomCategory() {
@@ -68,6 +70,7 @@ async function saveRoomCategory() {
     await fetchData();
     alert('Room category added successfully!');
     categoryStore.closeModel();
+    router.go(0);
     // Reset form fields
     // newRoom = {
     //   name: '',
@@ -90,6 +93,7 @@ async function updateRoomCategory() {
     alert('Failed to update record');
   } else {
     alert('Record updated successfully');
+    router.go(0);
   }
 
   categoryStore.setEditMode(false);

@@ -59,7 +59,9 @@ import { useFetch } from '#app';
 import { useRoomModalStore } from '@/stores/room';
 
 const roomStore = useRoomModalStore();
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 // const form = roomStore.record;
 const categories = ref([]);
 const error = ref('');
@@ -89,6 +91,7 @@ async function save() {
   } else {
     alert('room category added successfully!');
     roomStore.closeModel();
+    router.go(0);
     // Reset form fields
     // newRoom = {
     //   name: '',
@@ -111,6 +114,7 @@ async function update() {
     alert('Failed to update record');
   } else {
     alert('Record updated successfully');
+    router.go(0);
   }
 
   roomStore.setEditMode(false);

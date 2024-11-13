@@ -60,13 +60,11 @@ const calculateStayDetails = (checkinDate) => {
     totalDays.value = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
   }
 };
-import { useRouter, useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const route = useRoute();
-const checkoutRoom = async () => {
-  router.push(route.fullPath);
 
+const checkoutRoom = async () => {
   if (!selectedRoom.value || !checkoutDate.value) {
     alert('Please select room and checkout date');
     return;
@@ -91,6 +89,7 @@ const checkoutRoom = async () => {
   roomDetails.value = null;
   payment.value = 0;
   description.value = '';
+  router.go(0);
 };
 </script>
 

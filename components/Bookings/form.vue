@@ -197,7 +197,9 @@ import { useBookingModalStore } from '@/stores/booking';
 const categories = ref([]);
 const rooms = ref([]);
 const error = ref('');
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const bookingStore = useBookingModalStore();
 onMounted(async () => {
   try {
@@ -300,6 +302,7 @@ const save = async () => {
   } else {
     alert('Room category added successfully!');
     bookingStore.closeModel();
+    router.go(0);
   }
 };
 
@@ -327,6 +330,7 @@ async function update() {
     // Perform any necessary actions like updating the UI or redirecting
     bookingStore.setEditMode(false);
     bookingStore.closeModel();
+    router.go(0);
   } else {
     // Handle unsuccessful response
     alert(response.message); // Log the error message
