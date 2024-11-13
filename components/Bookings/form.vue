@@ -119,8 +119,12 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Room</label>
-          <select v-model="form.room" class="input-field" required>
+          <label class="block text-sm font-medium text-gray-700 mb-2"
+            >Room <small class="text-sm" v-if="bookingStore.editMode">({{ form.roomNumber }})</small></label
+          >
+
+          <!-- <input type="text" v-if="bookingStore.editMode" v-model="form.room" class="input-field" disabled readonly /> -->
+          <select v-model="form.room" class="input-field">
             <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.roomNumber }}</option>
           </select>
         </div>
@@ -251,7 +255,7 @@ const states = [
 ];
 
 //
-const departments = ['Department 1', 'Department 2', 'Department 3'];
+// const departments = ['Department 1', 'Department 2', 'Department 3'];
 
 // Save data
 const save = async () => {

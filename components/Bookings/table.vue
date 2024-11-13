@@ -20,7 +20,7 @@ const headers = [
   { key: 'checkOutTime', label: 'Check Out' },
   { key: 'mobile', label: 'Mobile' },
   { key: 'city', label: 'City' },
-  { key: 'room', label: 'Room Status' },
+  { key: 'roomStatus', label: 'Room Status' },
   { key: 'payment', label: 'Payment' },
   { key: 'actions', label: ['edit', 'delete'] }
 ];

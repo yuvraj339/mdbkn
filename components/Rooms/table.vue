@@ -17,7 +17,7 @@ const headers = [
   { key: 'id', label: 'ID' },
   { key: 'floorNumber', label: 'Floor Number' },
   { key: 'roomNumber', label: 'Room Number' },
-  { key: 'roomCategory', label: 'Room Category' },
+  { key: 'name', label: 'Room Category' },
   // { key: 'bookedDate', label: 'Booked Date' },
   // { key: 'isBooked', label: 'Is Booked' },
   { key: 'guestCapacity', label: 'Guest Capacity' },

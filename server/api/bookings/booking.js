@@ -10,7 +10,7 @@ function updateRoomStatus(roomID, status) {
 
 export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
-    const { rows } = await db.sql`SELECT * FROM bookings`;
+    const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id order by checkInTime DESC`;
 
     return {
       rows
