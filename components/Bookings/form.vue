@@ -133,6 +133,14 @@
           <input type="number" v-model="form.payment" class="input-field" />
         </div>
         <div>
+          <!-- <img :src="form.document" class="max-h-10 max-w-40" /> -->
+          <!-- <a :href="'public' + form.document" :download="form.document">
+            <button>Download Image</button>
+          </a> -->
+          <div v-if="bookingStore.editMode" class="border border-solid">
+            <a :href="imgHrf"> <img id="img1" :src="form.document" alt="Zoomable Image" @click="toggleImage" class="zoomable h-10 w-40" /> </a>
+            <!-- <a href="#" class="close"> Close Zoom</a> -->
+          </div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Upload document</label>
           <input type="file" @change="handleFileUpload" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" />
         </div>
@@ -204,7 +212,18 @@ onMounted(async () => {
   }
 });
 
+let imgHrf = ref('#img1');
+const toggleImage = () => {
+  imgHrf.value = imgHrf.value == '#img1' ? '#' : '#img1';
+};
 const form = ref(bookingStore.record);
+// const images = import.meta.glob('~/assets/uploads/*');
+// const imagePath = computed(() => images['/assets/uploads/1731484622429_icon.png']);
+
+// console.log(imagePath, 'imagePath');
+// const imagePath = `~/${form.value.document}`;
+// const imagePath = computed(() => require(`~/${form.value.document}`));
+
 // const storeData = props.storeData;
 let uploadedFile = '';
 
@@ -471,5 +490,17 @@ async function update() {
 <style scoped>
 .input-field {
   @apply w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent;
+}
+.zoomable {
+  width: 200px;
+  transition: transform 0.5s ease;
+}
+
+#img1:target {
+  transform: scale(5);
+}
+
+.close {
+  display: none;
 }
 </style>

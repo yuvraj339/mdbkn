@@ -27,8 +27,9 @@ export default defineEventHandler(async (event) => {
       for (const field of formData) {
         if (field.name === 'document' && field.type && field.type.startsWith('image/')) {
           const fileName = `${Date.now()}_${field.filename}`;
-          uploadPath = path.join('assets', 'uploads', fileName);
+          uploadPath = path.join('public', 'uploads', fileName);
           fs.writeFileSync(uploadPath, field.data);
+          uploadPath = path.join('\\', 'uploads', fileName);
         } else {
           const value = field.data.toString();
           // Convert 'null' string to actual null value

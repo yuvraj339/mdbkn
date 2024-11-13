@@ -61,10 +61,11 @@ export default defineEventHandler(async (event) => {
         if (field.name === 'document' && field.type && field.type.startsWith('image/')) {
           // Process file upload
           const fileName = `${Date.now()}_${field.filename}`;
-          uploadPath = path.join('assets', 'uploads', fileName);
+          uploadPath = path.join('public', 'uploads', fileName);
 
           // Save file to assets/uploads folder
           fs.writeFileSync(uploadPath, field.data);
+          uploadPath = path.join('\\', 'uploads', fileName);
         } else {
           // Collect other fields into the fields object
           fields[field.name] = field.data.toString(); // Convert Buffer to string
