@@ -45,59 +45,35 @@
           </div>
         </div>
       </div>
-      <!-- Patient Information -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Patient Name</label>
-          <input type="text" v-model="form.patientName" class="input-field" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Hospital (Department)</label>
-          <input type="text" v-model="form.hospital" class="input-field" />
-          <!-- <select v-model="form.hospital" class="input-field">
-            <option v-for="department in departments" :key="department">{{ department }}</option>
-          </select> -->
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Patient Ward No</label>
-          <input type="text" v-model="form.wardNo" class="input-field" />
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Upload document</label>
-          <input type="file" @change="handleFileUpload" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" />
-        </div>
-      </div>
-      <!-- Check-in Time, Category, Room, and Payment -->
+
+      <!-- Guest Information -->
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Check-in Time</label>
-          <input type="datetime-local" v-model="form.checkInTime" class="input-field" required />
+          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Name</label>
+          <input type="text" v-model="form.guestName" class="input-field" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Check-out Time</label>
-          <input type="datetime-local" v-model="form.checkOutTime" class="input-field" required />
+          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Father Name</label>
+          <input type="text" v-model="form.guestFName" class="input-field" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
-
-          <select v-model="form.category" class="input-field" required>
-            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Patient/Guest Relation</label>
+          <input type="text" v-model="form.patientGuestRelation" class="input-field" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Caste</label>
+          <input type="text" v-model="form.caste" class="input-field" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Gender</label>
+          <select v-model="form.gender" class="input-field">
+            <option v-for="gender in genders" :key="gender">{{ gender }}</option>
           </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Room</label>
-          <select v-model="form.room" class="input-field" required>
-            <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.roomNumber }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Advance Payment</label>
-          <input type="number" v-model="form.payment" class="input-field" />
         </div>
       </div>
 
       <!-- Additional  Details -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mt-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Mobile No</label>
           <input type="text" v-model="form.mobile" class="input-field" required />
@@ -116,28 +92,76 @@
           <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
           <input type="text" v-model="form.city" class="input-field" />
         </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tehsil</label>
+          <input type="text" v-model="form.tehsil" class="input-field" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Village</label>
+          <input type="text" v-model="form.village" class="input-field" />
+        </div>
+      </div>
+      <!-- Check-in Time, Category, Room, and Payment -->
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Check-in Time</label>
+          <input type="datetime-local" v-model="form.checkInTime" class="input-field" required />
+        </div>
+        <!-- <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Check-out Time</label>
+          <input type="datetime-local" v-model="form.checkOutTime" class="input-field" required />
+        </div> -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+
+          <select v-model="form.category" class="input-field" required>
+            <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Room</label>
+          <select v-model="form.room" class="input-field" required>
+            <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.roomNumber }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Advance Payment</label>
+          <input type="number" v-model="form.payment" class="input-field" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Upload document</label>
+          <input type="file" @change="handleFileUpload" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" />
+        </div>
       </div>
 
-      <!-- <hr /> -->
-      <!-- Guest Information -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+      <!-- Patient Information -->
+      <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mt-6">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Name</label>
-          <input type="text" v-model="form.guestName" class="input-field" />
+          <label class="block text-sm font-medium text-gray-700 mb-2">Patient Name</label>
+          <input type="text" v-model="form.patientName" class="input-field" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Patient/Guest Relation</label>
-          <input type="text" v-model="form.patientGuestRelation" class="input-field" />
+          <label class="block text-sm font-medium text-gray-700 mb-2">Hospital (Department)</label>
+          <input type="text" v-model="form.hospital" class="input-field" />
+          <!-- <select v-model="form.hospital" class="input-field">
+            <option v-for="department in departments" :key="department">{{ department }}</option>
+          </select> -->
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Caste</label>
-          <input type="text" v-model="form.caste" class="input-field" />
+          <label class="block text-sm font-medium text-gray-700 mb-2">Patient Ward No</label>
+          <input type="text" v-model="form.wardNo" class="input-field" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Guest Gender</label>
-          <select v-model="form.gender" class="input-field">
-            <option v-for="gender in genders" :key="gender">{{ gender }}</option>
-          </select>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Hospital Room</label>
+          <input type="text" v-model="form.hospitalRoomNumber" class="input-field" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Bed</label>
+          <input type="text" v-model="form.hospitalBedNumber" class="input-field" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Doctor Name</label>
+          <input type="text" v-model="form.doctorName" class="input-field" />
         </div>
       </div>
       <!-- Extra Remarks and Submit -->
@@ -166,7 +190,7 @@ const bookingStore = useBookingModalStore();
 onMounted(async () => {
   try {
     const cat_response = await $fetch('/api/rooms/category/all_categories');
-    const room_response = await $fetch('/api/rooms/room/all_rooms');
+    const room_response = await $fetch('/api/rooms/room/available');
     categories.value = cat_response; // Adjust to match the response structure
     rooms.value = room_response; // Adjust to match the response structure
     console.log('Categories:', rooms.value);

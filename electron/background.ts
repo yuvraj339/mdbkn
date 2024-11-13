@@ -31,7 +31,7 @@ function createWindow() {
       devTools: !isProduction,
       nodeIntegration: true,
       contextIsolation: false,
-      preload: path.join(__dirname, 'preload.js'),
+      // preload: path.join(__dirname, 'preload.js'),
       sandbox: false,
       webSecurity: false // Try disabling this temporarily to see if it’s the issue
     },

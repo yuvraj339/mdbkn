@@ -4,7 +4,6 @@ var records = {
   patientType: '',
   bookingType: '',
   checkInTime: '',
-  checkOutTime: '',
   category: '',
   room: '',
   payment: '',
@@ -17,9 +16,15 @@ var records = {
   age: '',
   state: '',
   city: '',
+  tehsil: '',
+  village: '',
   patientName: '',
   hospital: '',
   wardNo: '',
+  guestFName: '',
+  hospitalRoomNumber: '',
+  hospitalBedNumber: '',
+  doctorName: '',
   remark: ''
 };
 export const useBookingModalStore = defineStore('modalBooking', {

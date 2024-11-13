@@ -32,7 +32,7 @@ export const useAuthStore = defineStore('auth', {
     updateOnReload() {
       let auth = JSON.parse(localStorage.getItem('isAuthenticated'));
       let localStUser = localStorage.getItem('user');
-      let user = JSON.parse(localStUser);
+      let user = localStUser != 'undefined' ? JSON.parse(localStUser) : undefined;
 
       if (auth) {
         this.isAuthenticated = auth;

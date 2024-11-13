@@ -15,7 +15,6 @@ onMounted(async () => {
   try {
     const response = await $fetch('/api/dashboard/alldata');
     // const cat_response = await $fetch('/api/rooms/category/all_categories');
-    // const room_response = await $fetch('/api/rooms/room/all_rooms');
     // categories.value = cat_response; // Adjust to match the response structure
     // rooms.value = room_response; // Adjust to match the response structure
     console.log('response:', response);

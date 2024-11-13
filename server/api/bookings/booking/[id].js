@@ -10,6 +10,11 @@ function updateRoomStatus(roomID, status) {
 export default defineEventHandler(async (event) => {
   const id = event.context.params?.id;
 
+  if (event.node.req.method === 'GET') {
+    const { rows } = await db.sql`SELECT * FROM bookings where id = ${id}`;
+    return rows;
+  }
+
   if (event.node.req.method === 'POST' && id) {
     const formData = await readMultipartFormData(event);
 
@@ -51,7 +56,7 @@ export default defineEventHandler(async (event) => {
       patientType: fields.patientType || existingRecord.patientType,
       bookingType: fields.bookingType || existingRecord.bookingType,
       checkInTime: fields.checkInTime || existingRecord.checkInTime,
-      checkOutTime: fields.checkOutTime || existingRecord.checkOutTime,
+      // checkOutTime: fields.checkOutTime || existingRecord.checkOutTime,
       category: fields.category || existingRecord.category,
       room: fields.room !== null ? fields.room : existingRecord.room,
       payment: fields.payment || existingRecord.payment,
@@ -63,16 +68,23 @@ export default defineEventHandler(async (event) => {
       caste: fields.caste || existingRecord.caste,
       age: fields.age !== null ? fields.age : existingRecord.age,
       state: fields.state || existingRecord.state,
+      tehsil: fields.tehsil || existingRecord.tehsil,
+      village: fields.village || existingRecord.village,
       city: fields.city || existingRecord.city,
       patientName: fields.patientName || existingRecord.patientName,
       hospital: fields.hospital || existingRecord.hospital,
       wardNo: fields.wardNo || existingRecord.wardNo,
+      guestFName: fields.guestFName || existingRecord.guestFName,
+      hospitalRoomNumber: fields.hospitalRoomNumber || existingRecord.hospitalRoomNumber,
+      hospitalBedNumber: fields.hospitalBedNumber || existingRecord.hospitalBedNumber,
+      doctorName: fields.doctorName || existingRecord.doctorName,
       remark: fields.remark || existingRecord.remark
     };
-    console.log('updatedFields', updatedFields);
+    // console.log('updatedFields', updatedFields);
     const statement = db.prepare(`
       UPDATE bookings
-      SET patientType = ?, bookingType = ?, checkInTime = ?, checkOutTime = ?, category = ?, room = ?, payment = ?, mobile = ?, guestName = ?, patientGuestRelation = ?, document = ?, gender = ?, caste = ?, age = ?, state = ?, city = ?, patientName = ?, hospital = ?, wardNo = ?, remark = ?
+      SET patientType = ?, bookingType = ?, checkInTime = ?, category = ?, room = ?, payment = ?, mobile = ?, guestName = ?, patientGuestRelation = ?, document = ?, gender = ?, caste = ?, age = ?, state = ?, city = ?, tehsil = ?,
+village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospitalRoomNumber = ?,  hospitalBedNumber = ?,  doctorName = ?, remark = ?
       WHERE id = ?
     `);
 
@@ -80,7 +92,7 @@ export default defineEventHandler(async (event) => {
       updatedFields.patientType,
       updatedFields.bookingType,
       updatedFields.checkInTime,
-      updatedFields.checkOutTime,
+      // updatedFields.checkOutTime,
       updatedFields.category,
       updatedFields.room,
       updatedFields.payment,
@@ -93,9 +105,15 @@ export default defineEventHandler(async (event) => {
       updatedFields.age,
       updatedFields.state,
       updatedFields.city,
+      updatedFields.tehsil,
+      updatedFields.village,
       updatedFields.patientName,
       updatedFields.hospital,
       updatedFields.wardNo,
+      updatedFields.guestFName,
+      updatedFields.hospitalRoomNumber,
+      updatedFields.hospitalBedNumber,
+      updatedFields.doctorName,
       updatedFields.remark,
       id
     );

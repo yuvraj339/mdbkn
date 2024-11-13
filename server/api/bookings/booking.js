@@ -17,9 +17,9 @@ export default defineEventHandler(async (event) => {
     };
   }
   if (event.node.req.method === 'POST') {
-    //   await db.sql`DROP TABLE IF EXISTS bookings`;
-    //   // Create table if it doesn't exist
-    //   await db.sql`CREATE TABLE IF NOT EXISTS bookings (
+    // await db.sql`DROP TABLE IF EXISTS bookings`;
+    // //   // Create table if it doesn't exist
+    // await db.sql`CREATE TABLE IF NOT EXISTS bookings (
     //   id INTEGER PRIMARY KEY AUTOINCREMENT,
     //   patientType TEXT,
     //   bookingType TEXT,
@@ -37,9 +37,15 @@ export default defineEventHandler(async (event) => {
     //   age INTEGER,
     //   state TEXT,
     //   city TEXT,
+    //   tehsil TEXT,
+    //   village TEXT,
     //   patientName TEXT,
     //   hospital TEXT,
     //   wardNo TEXT,
+    //   guestFName TEXT,
+    //   hospitalRoomNumber TEXT,
+    //   hospitalBedNumber TEXT,
+    //   doctorName TEXT,
     //   remark TEXT,
     //   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     //   FOREIGN KEY (room) REFERENCES rooms(id)
@@ -78,10 +84,10 @@ export default defineEventHandler(async (event) => {
       // Prepare insert statement
       const statement = db.prepare(`
       INSERT INTO bookings (
-        patientType, bookingType, checkInTime, checkOutTime, category, room, payment, mobile,
-        guestName, patientGuestRelation, document, gender, caste, age, state, city,
-        patientName, hospital, wardNo, remark
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        patientType, bookingType, checkInTime, category, room, payment, mobile,
+        guestName, patientGuestRelation, document, gender, caste, age, state, city,tehsil,village,
+        patientName, hospital, wardNo, guestFName, hospitalRoomNumber, hospitalBedNumber, doctorName, remark
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
       // Insert data into the database
@@ -89,7 +95,7 @@ export default defineEventHandler(async (event) => {
         fields.patientType || null,
         fields.bookingType || null,
         fields.checkInTime || null,
-        fields.checkOutTime || null,
+        // fields.checkOutTime || null,
         fields.category || null,
         fields.room || null,
         fields.payment || null,
@@ -102,9 +108,15 @@ export default defineEventHandler(async (event) => {
         fields.age || null,
         fields.state || null,
         fields.city || null,
+        fields.tehsil || null,
+        fields.village || null,
         fields.patientName || null,
         fields.hospital || null,
         fields.wardNo || null,
+        fields.guestFName || null,
+        fields.hospitalRoomNumber || null,
+        fields.hospitalBedNumber || null,
+        fields.doctorName || null,
         fields.remark || null
       );
 
