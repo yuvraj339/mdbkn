@@ -1,7 +1,7 @@
 
 # Define the path to the SQLite database
-$DBPath = ".data/db.sqlite3"
-
+# $DBPath = ".data/db.sqlite3" same path 
+$DBPath = "../.data/db.sqlite3"
 # Define the backup directory
 $BackupDir = "C:\"
 
@@ -19,5 +19,5 @@ $BackupFile = "$BackupDir\db_date_backup_$Timestamp.sqlite"
 # Copy the database to the backup directory with the timestamp in the filename
 Copy-Item -Path $DBPath -Destination $BackupFile -ErrorAction Stop
 
-# Confirm the backup
+# Confirm the backup    
 Write-Output "Backup successful: $BackupFile"

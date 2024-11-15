@@ -1,11 +1,11 @@
-
 ### Install NODE: 20.9.0 NPM: 10.1.0 database: sqlite3
 
 ### npm install
 
-## if not work =>   npm rebuild
+## if not work => npm rebuild
 
-npm run dev or 
+npm run dev or
+
 ### npm run dev:electron:win
 
 make .pfx, remove line space before run this in powerShell by administrative
@@ -21,3 +21,5 @@ Export-PfxCertificate -FilePath "C:\certificate.pfx" -Password $password
 ## npm run transpile-electron
 
 ## npm run build:electron
+
+## npx nuxi devtools disable
