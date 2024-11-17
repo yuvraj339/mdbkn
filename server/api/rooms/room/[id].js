@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
         join room_category 
         on room_category.id == rooms.roomCategory 
         join bookings
-        on bookings.room == rooms.roomCategory
+        on bookings.category == rooms.roomCategory
       where rooms.id = ${id} `;
     return rows;
   }
