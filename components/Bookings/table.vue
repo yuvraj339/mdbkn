@@ -21,6 +21,7 @@ const headers = [
   { key: 'mobile', label: 'Mobile' },
   { key: 'city', label: 'City' },
   { key: 'roomStatus', label: 'Room Status' },
+  { key: 'roomNumber', label: 'Room Number' },
   { key: 'payment', label: 'Payment' },
   { key: 'actions', label: ['edit', 'delete'] }
 ];
