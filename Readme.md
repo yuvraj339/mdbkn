@@ -2,7 +2,7 @@
 
 ### npm install
 
-## if not work => npm rebuild
+## if not work try "npm rebuild"
 
 npm run dev or
 
