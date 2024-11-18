@@ -10,10 +10,14 @@ export default defineEventHandler(async (event) => {
         join room_category 
         on room_category.id == rooms.roomCategory 
         join bookings
-        on bookings.category == rooms.roomCategory
-      where rooms.id = ${id} `;
+        on bookings.room == rooms.id
+      where rooms.id = ${id} and bookings.room =  ${id} `;
     return rows;
+    // on bookings.category == rooms.roomCategory // removed because he changing room category
   }
+  // jagdish, 114 madanlal
+  // 125 sultan guest name27th
+
   if (event.node.req.method === 'PUT' && id) {
     const { floorNumber, roomNumber, roomCategory, guestCapacity, roomStatus, amenities, remarks } = await readBody(event);
 
