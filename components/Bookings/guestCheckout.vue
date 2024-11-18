@@ -44,6 +44,23 @@ const fetchRoomDetails = async () => {
   // guestDetails.value = guestResponse || {};
 };
 
+// // Calculate stay details on checkout date change
+// const calculateStayDetails = (checkinDate) => {
+//   if (checkinDate && checkoutDate) {
+//     // Convert to Date objects
+//     const checkin = new Date(checkinDate);
+//     const checkout = new Date(checkoutDate.value);
+
+//     // Set time to 00:00:00 for both dates
+//     checkin.setHours(0, 0, 0, 0);
+//     checkout.setHours(0, 0, 0, 0);
+
+//     // Calculate difference in days
+//     const differenceInTime = checkout - checkin;
+//     totalDays.value = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
+//   }
+// };
+
 // Calculate stay details on checkout date change
 const calculateStayDetails = (checkinDate) => {
   if (checkinDate && checkoutDate) {
@@ -51,13 +68,22 @@ const calculateStayDetails = (checkinDate) => {
     const checkin = new Date(checkinDate);
     const checkout = new Date(checkoutDate.value);
 
-    // Set time to 00:00:00 for both dates
-    checkin.setHours(0, 0, 0, 0);
-    checkout.setHours(0, 0, 0, 0);
+    // If the checkout date is the same as the check-in date
+    if (checkin.getFullYear() === checkout.getFullYear() && checkin.getMonth() === checkout.getMonth() && checkin.getDate() === checkout.getDate()) {
+      totalDays.value = 1;
+    } else {
+      // If checkout date is the next day and time is after 11:00 AM
+      const nextDay = new Date(checkin);
+      nextDay.setDate(nextDay.getDate() + 1);
 
-    // Calculate difference in days
-    const differenceInTime = checkout - checkin;
-    totalDays.value = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
+      if (nextDay.getFullYear() === checkout.getFullYear() && nextDay.getMonth() === checkout.getMonth() && nextDay.getDate() === checkout.getDate() && checkout.getHours() >= 11) {
+        totalDays.value = 2;
+      } else {
+        // General case for difference in days
+        const differenceInTime = checkout - checkin;
+        totalDays.value = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
+      }
+    }
   }
 };
 import { useRouter } from 'vue-router';
