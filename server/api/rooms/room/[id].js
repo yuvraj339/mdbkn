@@ -4,14 +4,27 @@ export default defineEventHandler(async (event) => {
 
   if (event.node.req.method === 'GET') {
     const { rows } = await db.sql`SELECT 
-      room_category.name, room_category.normalRent, room_category.patientRent,
-      bookings.payment, bookings.guestName, bookings.checkInTime
-      FROM rooms 
-        join room_category 
-        on room_category.id == rooms.roomCategory 
-        join bookings
-        on bookings.room == rooms.id
-      where rooms.id = ${id} and bookings.room =  ${id} `;
+    room_category.name, 
+    room_category.normalRent, 
+    room_category.patientRent,
+    bookings.payment, 
+    bookings.guestName, 
+    bookings.checkInTime, 
+    bookings.checkOutTime
+FROM 
+    rooms 
+JOIN 
+    room_category 
+ON 
+    room_category.id = rooms.roomCategory 
+JOIN 
+    bookings
+ON 
+    bookings.room = rooms.id
+WHERE 
+    rooms.id = ${id} 
+    AND bookings.room = ${id} 
+    AND bookings.checkOutTime IS NULL;`;
     return rows;
     // on bookings.category == rooms.roomCategory // removed because he changing room category
   }

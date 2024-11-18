@@ -11,6 +11,7 @@ const roomPrice = ref(0);
 const description = ref('');
 const payment = ref('0');
 let totalDays = ref(0);
+let totalAmount = ref(0);
 
 // = computed(() => {
 //   if (!guestDetails.value || !checkoutDate.value) return 0;
@@ -22,8 +23,8 @@ let totalDays = ref(0);
 const remainingPayment = computed(() => {
   if (!roomDetails.value) return 0;
   const advancePayment = roomDetails.value[0].payment;
-  const totalAmount = totalDays.value * roomPrice.value;
-  const rmp = totalAmount - advancePayment;
+  totalAmount.value = totalDays.value * roomPrice.value;
+  const rmp = totalAmount.value - advancePayment;
   payment.value = rmp;
   return rmp;
 });
@@ -112,6 +113,7 @@ const checkoutRoom = async () => {
   selectedRoom.value = '';
   checkoutDate.value = '';
   remainingPayment.value = 0;
+  totalAmount.value = 0;
   roomDetails.value = null;
   payment.value = 0;
   description.value = '';
@@ -163,7 +165,12 @@ const checkoutRoom = async () => {
           >Total Days: <strong class="text-gray-700">{{ totalDays }}</strong></p
         >
         <p
-          >Remaining Payment: <strong class="text-gray-700">{{ remainingPayment }}</strong></p
+          >Total Payment: <strong class="text-gray-700">{{ totalAmount }}</strong></p
+        >
+        <p
+          ><span v-if="remainingPayment < 0"> Refund Amount </span>
+          <span v-else> Remaining Payment: </span>
+          <strong class="text-gray-700">{{ remainingPayment }}</strong></p
         >
       </div>
     </div>
