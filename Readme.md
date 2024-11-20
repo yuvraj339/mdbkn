@@ -23,3 +23,7 @@ Export-PfxCertificate -FilePath "C:\certificate.pfx" -Password $password
 ## npm run build:electron
 
 ## npx nuxi devtools disable
+
+## npm install xlsx
+
+## npm install jspdf

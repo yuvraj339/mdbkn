@@ -7,7 +7,10 @@
     <div v-else>
       <div class="flex justify-between">
         <input v-model="search" type="text" placeholder="Search..." class="p-2 border border-gray-300 rounded mb-4" />
-        <div> </div>
+        <div>
+          <!-- <button @click="exportToPDF">Export to PDF</button> -->
+          <button @click="exportToExcel" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-2 rounded-lg">Export to Excel</button>
+        </div>
 
         <!-- Records per page -->
         <div>
@@ -19,7 +22,7 @@
       </div>
 
       <!-- Table -->
-      <table class="min-w-full table-auto">
+      <table class="min-w-full table-auto" ref="pdfContent">
         <thead>
           <tr>
             <th v-for="header in headers" :key="header" @click="sortBy(header.key)" class="text-xs">
@@ -64,7 +67,8 @@
 <script setup>
 import { ref, computed, onMounted, watchEffect } from 'vue';
 import { useFetchData } from '@/composables/fetchData';
-
+import jsPDF from 'jspdf';
+import * as XLSX from 'xlsx';
 // Data properties
 // const records = ref([]);
 const search = ref('');
@@ -94,6 +98,25 @@ const editRecord = async (data) => {
 
   // await fetchData('PUT', `/api/rooms/${roomId}`, updatedData);
 };
+const pdfContent = ref(null);
+// function exportToPDF() {
+//   const doc = new jsPDF();
+//   const content = pdfContent.value;
+
+//   doc.html(content, {
+//     callback: (doc) => {
+//       doc.save('example.pdf');
+//     },
+//     x: 10,
+//     y: 10
+//   });
+// }
+function exportToExcel() {
+  const worksheet = XLSX.utils.json_to_sheet(records.value);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+  XLSX.writeFile(workbook, `export_${new Date().toISOString()}.xlsx`);
+}
 
 const deleteRecord = async (id) => {
   const { data, error } = await useFetch(`${props.apiURL}/${id}`, {
