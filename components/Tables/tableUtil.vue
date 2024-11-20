@@ -67,7 +67,7 @@
 <script setup>
 import { ref, computed, onMounted, watchEffect } from 'vue';
 import { useFetchData } from '@/composables/fetchData';
-import jsPDF from 'jspdf';
+// import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 // Data properties
 // const records = ref([]);
