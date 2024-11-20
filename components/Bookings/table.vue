@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TablesTableUtil :headers="headers" :apiURL="api_url" :store="bookingStore"></TablesTableUtil>
+    <TablesTableUtil :headers="headers" :apiURL="api_url" :store="bookingStore" ref="tableChild"></TablesTableUtil>
   </div>
 </template>
 
@@ -11,6 +11,13 @@ const bookingStore = useBookingModalStore();
 // function addCategory() {
 //   categoryStore.toggleModal()
 // }
+
+const tableChild = ref(null);
+
+const refreshTableChildren = () => {
+  alert(1);
+  tableChild.value.fetchData();
+};
 const props = defineProps({
   api_url: {
     type: String,

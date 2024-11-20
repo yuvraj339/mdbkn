@@ -16,6 +16,9 @@ let selectedDate = ref(new Date().toISOString().split("T")[0]);
 let roomStatus = ref('unavailable');
 // const bookingStore = useBookingModalStore();
 onMounted(async () => {
+  await fetchLatestData()
+});
+async function fetchLatestData() {
   try {
     const response = await $fetch('/api/dashboard/alldata');
     // const cat_response = await $fetch('/api/rooms/category/all_categories');
@@ -27,8 +30,7 @@ onMounted(async () => {
     error.value = err.message;
     console.log('Error fetching records:', err);
   }
-});
-
+}
 async function showData(relatedTo) {
   // alert(relatedTo)
   selectedCard.value = relatedTo
@@ -44,10 +46,37 @@ async function showData(relatedTo) {
   //   console.log('Error fetching records:', err);
   // }
 }
+const bookingChild = ref(null);
+function filterData() {
+  // debugger
+  // await fetchLatestData()
+  selectedCard.value = 'currentBookings'
+  bookingChild.value.refreshTableChildren()
+}
 </script>
 <template>
   <div>
     <h2 class="text-3xl font-bold mb-6">Welcome to Maheshwari Dharamshala</h2>
+    <div>
+      <div class="grid grid-cols-3 gap-5 p-5 mt-5 mb-5 border border-gray-200">
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Select Date:</label>
+          <input type="date" v-model="selectedDate" class="w-full p-2 border rounded" />
+        </div>
+        <div class="mb-4">
+          <label class="block font-medium mb-1">Select Room Status:</label>
+          <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" v-model="roomStatus">
+            <option key="available" value="available">Available</option>
+            <option key="unavailable" value="unavailable">Unavailable</option>
+            <!-- <option v-for="option in field.options" :key="option.id" :value="option.id">{{ option.name }}</option> -->
+          </select>
+        </div>
+        <div class="mb-4">
+          <label>&nbsp;</label>
+          <button @click="filterData" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-2 rounded-lg">Set Filter</button>
+        </div>
+      </div>
+    </div>
     <div class="grid grid-cols-3 gap-6">
       <div class="bg-yellow-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('currentBookings')">
         <h3 class="text-2xl font-bold">{{ dashboardData.currentBookings }}</h3>
@@ -74,12 +103,13 @@ async function showData(relatedTo) {
         <p>Due Balance</p>
       </div>
     </div>
+
     <div>
       <BookingsTable v-if="selectedCard == 'currentBookings'" />
       <RoomsTable v-if="selectedCard == 'roomDatabase'" />
       <BookingsTable v-if="selectedCard == 'todayBookings'" :api_url="`/api/bookings/booking?date=${selectedDate}`" />
       <RoomsTable v-if="selectedCard == 'roomBooked'" :api_url="`/api/rooms/room/${roomStatus}`" />
-      <BookingsTable v-if="selectedCard == 'todayCheckouts'" :api_url="`/api/bookings/booking?date=${selectedDate}&status=checkout`" />
+      <BookingsTable ref="bookingChild" v-if="selectedCard == 'todayCheckouts'" :api_url="`/api/bookings/booking?date=${selectedDate}&status=checkout`" />
     </div>
   </div>
 </template>
