@@ -10,11 +10,44 @@ function updateRoomStatus(roomID, status) {
 
 export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
-    const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id order by checkInTime DESC`;
-
-    return {
-      rows
-    };
+    const query = getQuery(event);
+    const { date, status } = query;
+    try {
+      if (date && status) {
+        // todays Checkout
+        const { rows } =
+          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date}`;
+        return {
+          rows
+        };
+      }
+      if (date) {
+        //todays booking
+        const { rows } =
+          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkInTime) = ${date} `;
+        return {
+          rows
+        };
+      } else if (status) {
+        // total booked room need to shift code to room
+        const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id `;
+        return {
+          rows
+        };
+      } else {
+        // total bookings
+        const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id `;
+        return {
+          rows
+        };
+      }
+    } catch (err) {
+      return {
+        status: 500,
+        message: 'Error fetching bookings.',
+        error: err.message
+      };
+    }
   }
   if (event.node.req.method === 'POST') {
     // await db.sql`DROP TABLE IF EXISTS bookings`;

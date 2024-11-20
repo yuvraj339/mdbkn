@@ -204,9 +204,9 @@ const bookingStore = useBookingModalStore();
 onMounted(async () => {
   try {
     const cat_response = await $fetch('/api/rooms/category/all_categories');
-    const room_response = await $fetch('/api/rooms/room/available');
+    const { rows } = await $fetch('/api/rooms/room/available');
     categories.value = cat_response; // Adjust to match the response structure
-    rooms.value = room_response; // Adjust to match the response structure
+    rooms.value = rows; // Adjust to match the response structure
     console.log('Categories:', rooms.value);
   } catch (err) {
     error.value = err.message;

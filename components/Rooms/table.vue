@@ -12,7 +12,13 @@ const roomStore = useRoomModalStore();
 // function addCategory() {
 //   categoryStore.toggleModal()
 // }
-const api_url = '/api/rooms/room';
+const props = defineProps({
+  api_url: {
+    type: String,
+    default: '/api/rooms/room' // Set your default URL here
+  }
+});
+// const api_url = '/api/rooms/room';
 const headers = [
   { key: 'id', label: 'ID' },
   { key: 'floorNumber', label: 'Floor Number' },
@@ -26,4 +32,4 @@ const headers = [
   { key: 'actions', label: ['edit', 'delete'] }
 ];
 </script>
-, , , amenities, , , remarks
+<!-- , , , amenities, , , remarks -->

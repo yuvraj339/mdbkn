@@ -30,8 +30,8 @@ const remainingPayment = computed(() => {
 });
 
 // Fetch room list (replace with actual API endpoint)
-const all_rooms = await $fetch('/api/rooms/room/unavailable');
-rooms.value = all_rooms || [];
+const { rows } = await $fetch('/api/rooms/room/unavailable');
+rooms.value = rows || [];
 
 // Fetch room details and guest details based on selected room
 const fetchRoomDetails = async () => {

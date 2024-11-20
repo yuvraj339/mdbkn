@@ -121,7 +121,7 @@ const deleteRecord = async (id) => {
 onMounted(() => {
   fetchData(); // Initial fetch when component mounts
 });
-const perPageOptions = [5, 10, 15, 20];
+const perPageOptions = [10, 20, 50, 100, 150];
 
 // Computed properties
 const filteredRecords = computed(() => {

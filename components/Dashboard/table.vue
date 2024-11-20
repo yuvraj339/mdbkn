@@ -11,13 +11,7 @@ const bookingStore = useBookingModalStore();
 // function addCategory() {
 //   categoryStore.toggleModal()
 // }
-const props = defineProps({
-  api_url: {
-    type: String,
-    default: '/api/bookings/booking' // Set your default URL here
-  }
-});
-// const api_url = ;
+const api_url = '/api/bookings/booking';
 const headers = [
   { key: 'id', label: 'ID' },
   { key: 'patientName', label: 'Patient Name' },
