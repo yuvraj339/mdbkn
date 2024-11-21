@@ -6,7 +6,7 @@ var records = {
   checkInTime: '',
   category: '',
   room: '',
-  payment: '',
+  payment: 1000,
   mobile: '',
   guestName: '',
   patientGuestRelation: '',
