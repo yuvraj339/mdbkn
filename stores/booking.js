@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 var records = {
   patientType: '',
   bookingType: '',
-  checkInTime: '',
+  checkInTime: getFormattedDateWithTime(16, 30),
   category: '',
   room: '',
   payment: 1000,
@@ -27,6 +27,21 @@ var records = {
   doctorName: '',
   remark: ''
 };
+function getFormattedDateWithTime(hour, minute) {
+  // Get today's date
+  const now = new Date();
+
+  // Set the specific hour and minute
+  now.setHours(hour);
+  now.setMinutes(minute);
+  now.setSeconds(0);
+  now.setMilliseconds(0);
+
+  // Format the date in YYYY-MM-DDTHH:mm
+  const formattedDate = now.toISOString().slice(0, 16);
+  // console.log(formattedDate);
+  return formattedDate;
+}
 export const useBookingModalStore = defineStore('modalBooking', {
   state: () => ({
     showModal: false,

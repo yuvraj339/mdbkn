@@ -15,7 +15,7 @@ export default defineEventHandler(async (event) => {
   // }
   if (event.node.req.method === 'POST') {
     const { checkOutTime, remark, payment: newPayment, room } = await readBody(event);
-    const existingRecord = await db.prepare(`SELECT payment FROM bookings WHERE room = ?`).get(room);
+    const existingRecord = await db.prepare(`SELECT payment FROM bookings WHERE checkOutTime IS NULL AND room = ?`).get(room);
     let totalPayment = newPayment;
     const fields_room = parseInt(room, 10);
     if (existingRecord) {
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event) => {
       const statement = db.prepare(`
         UPDATE bookings
         SET checkOutTime = ?, remark = ?, payment = ?, room = ?
-        WHERE room = ?
+        WHERE room = ? AND checkOutTime IS NULL
       `);
       // const statement = db.prepare(`INSERT INTO bookings (checkOutTime, remark, payment, room) VALUES (?, ?, ?, ?)`);
 

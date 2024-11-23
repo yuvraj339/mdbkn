@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-5xl mx-auto p-8 bg-white rounded-lg shadow-lg">
+  <div class="max-w-7xl mx-auto p-8 bg-white rounded-lg shadow-lg">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-lg font-semibold">{{ bookingStore.editMode ? 'Edit Booking' : 'Add Booking' }}</h2>
       <button @click="bookingStore.closeModel()">✖️</button>
@@ -102,15 +102,15 @@
         </div>
       </div>
       <!-- Check-in Time, Category, Room, and Payment -->
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mt-6">
+      <div :class="bookingStore.editMode ? 'grid grid-cols-1 md:grid-cols-6 gap-4 mt-6' : 'grid grid-cols-1 md:grid-cols-5 gap-4 mt-6'">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Check-in Time</label>
           <input type="datetime-local" v-model="form.checkInTime" class="input-field" required />
         </div>
-        <!-- <div>
+        <div v-if="bookingStore.editMode">
           <label class="block text-sm font-medium text-gray-700 mb-2">Check-out Time</label>
           <input type="datetime-local" v-model="form.checkOutTime" class="input-field" required />
-        </div> -->
+        </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
 
@@ -298,9 +298,9 @@ const save = async () => {
   });
 
   if (error) {
-    alert('Failed to save category');
+    alert('Failed to save Booking');
   } else {
-    alert('Room category added successfully!');
+    alert('Room Booking added successfully!');
     bookingStore.closeModel();
     router.go(0);
   }

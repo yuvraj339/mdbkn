@@ -57,7 +57,7 @@ export default defineEventHandler(async (event) => {
       patientType: fields.patientType || existingRecord.patientType,
       bookingType: fields.bookingType || existingRecord.bookingType,
       checkInTime: fields.checkInTime || existingRecord.checkInTime,
-      // checkOutTime: fields.checkOutTime || existingRecord.checkOutTime,
+      checkOutTime: fields.checkOutTime || existingRecord.checkOutTime,
       category: fields.category || existingRecord.category,
       room: fields.room !== null ? fields.room : existingRecord.room,
       payment: fields.payment || existingRecord.payment,
@@ -84,7 +84,7 @@ export default defineEventHandler(async (event) => {
     // console.log('updatedFields', updatedFields);
     const statement = db.prepare(`
       UPDATE bookings
-      SET patientType = ?, bookingType = ?, checkInTime = ?, category = ?, room = ?, payment = ?, mobile = ?, guestName = ?, patientGuestRelation = ?, document = ?, gender = ?, caste = ?, age = ?, state = ?, city = ?, tehsil = ?,
+      SET patientType = ?, bookingType = ?, checkInTime = ?, checkOutTime = ?, category = ?, room = ?, payment = ?, mobile = ?, guestName = ?, patientGuestRelation = ?, document = ?, gender = ?, caste = ?, age = ?, state = ?, city = ?, tehsil = ?,
 village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospitalRoomNumber = ?,  hospitalBedNumber = ?,  doctorName = ?, remark = ?
       WHERE id = ?
     `);
@@ -93,7 +93,7 @@ village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospita
       updatedFields.patientType,
       updatedFields.bookingType,
       updatedFields.checkInTime,
-      // updatedFields.checkOutTime,
+      updatedFields.checkOutTime,
       updatedFields.category,
       updatedFields.room,
       updatedFields.payment,

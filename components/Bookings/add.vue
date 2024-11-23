@@ -1,7 +1,7 @@
 <template>
   <!-- Add booking Modal -->
   <div v-if="bookingStore.showModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-    <div class="bg-white p-6 rounded-lg w-100 modal">
+    <div class="bg-white p-6 rounded-lg w-8/12 modal">
       <!-- {{ bookingStore.record }} -->
       <div class="space-y-4">
         <BookingsForm />
