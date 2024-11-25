@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     const query = getQuery(event);
     const { date, status } = query;
     try {
-      if (date && status) {
+      if (date && status == 'checkout') {
         // todays Checkout
         const { rows } =
           await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date}`;
@@ -28,12 +28,24 @@ export default defineEventHandler(async (event) => {
         return {
           rows
         };
-      } else if (status) {
+      }
+      if (status) {
         // total booked room need to shift code to room
-        const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id `;
+        const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus
+        FROM bookings 
+        join rooms on bookings.room == rooms.id 
+        where rooms.roomStatus = ${status} 
+        `;
         return {
           rows
         };
+
+        //   // SELECT rooms.*, name FROM rooms join room_category on rooms.roomCategory == room_category.id where rooms.roomStatus = 'Available'  order by rooms.roomNumber
+        //   const { rows } =
+        //   await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date}`;
+        //   return {
+        //     rows
+        //   };
       } else {
         // total bookings
         const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id `;
@@ -80,6 +92,7 @@ export default defineEventHandler(async (event) => {
     //   hospitalBedNumber TEXT,
     //   doctorName TEXT,
     //   remark TEXT,
+    //   amenities TEXT,
     //   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     //   FOREIGN KEY (room) REFERENCES rooms(id)
     // );`;
@@ -120,8 +133,8 @@ export default defineEventHandler(async (event) => {
       INSERT INTO bookings (
         patientType, bookingType, checkInTime, category, room, payment, mobile,
         guestName, patientGuestRelation, document, gender, caste, age, state, city,tehsil,village,
-        patientName, hospital, wardNo, guestFName, hospitalRoomNumber, hospitalBedNumber, doctorName, remark
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        patientName, hospital, wardNo, guestFName, hospitalRoomNumber, hospitalBedNumber, doctorName, remark, amenities
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
       // Insert data into the database
@@ -151,7 +164,8 @@ export default defineEventHandler(async (event) => {
         fields.hospitalRoomNumber || null,
         fields.hospitalBedNumber || null,
         fields.doctorName || null,
-        fields.remark || null
+        fields.remark || null,
+        fields.amenities || null
       );
 
       // console.log('Insert Result:', result);

@@ -59,6 +59,7 @@ export default defineEventHandler(async (event) => {
       hospitalBedNumber TEXT,
       doctorName TEXT,
       remark TEXT,
+      amenities TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (room) REFERENCES rooms(id)
     );`;

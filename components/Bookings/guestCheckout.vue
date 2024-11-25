@@ -12,6 +12,7 @@ const description = ref('');
 const payment = ref('0');
 let totalDays = ref(0);
 let totalAmount = ref(0);
+let amenities = ref(0);
 
 // = computed(() => {
 //   if (!guestDetails.value || !checkoutDate.value) return 0;
@@ -23,12 +24,12 @@ let totalAmount = ref(0);
 const remainingPayment = computed(() => {
   if (!roomDetails.value) return 0;
   const advancePayment = roomDetails.value[0].payment;
-  totalAmount.value = totalDays.value * roomPrice.value;
+  totalAmount.value = amenities.value + totalDays.value * roomPrice.value;
   const rmp = totalAmount.value - advancePayment;
   payment.value = rmp;
   return rmp;
 });
-
+// await $fetch('/api/migrations');
 // Fetch room list (replace with actual API endpoint)
 const { rows } = await $fetch('/api/rooms/room/unavailable');
 rooms.value = rows || [];
@@ -104,7 +105,8 @@ const checkoutRoom = async () => {
       checkOutTime: checkoutDate.value,
       remark: description.value,
       payment: payment.value,
-      room: selectedRoom.value
+      room: selectedRoom.value,
+      amenities: amenities.value
     }
   });
 
@@ -114,6 +116,7 @@ const checkoutRoom = async () => {
   checkoutDate.value = '';
   remainingPayment.value = 0;
   totalAmount.value = 0;
+  amenities.value = 0;
   roomDetails.value = null;
   payment.value = 0;
   description.value = '';
@@ -196,9 +199,19 @@ const checkoutRoom = async () => {
       </div>
     </div>
     <!-- Description Box -->
-    <div class="mb-4">
-      <label class="block font-medium mb-1">Enter final payment amount:</label>
-      <input type="number" v-model="payment" class="w-full p-2 border rounded" />
+    <div class="grid grid-cols-2 gap-5">
+      <div class="mb-4">
+        <label class="block font-medium mb-1">Enter amenities amount:</label>
+        <input type="number" v-model="amenities" class="w-full p-2 border rounded" />
+      </div>
+      <div class="mb-4">
+        <label class="block font-medium mb-1">Enter final payment amount:</label>
+        <input type="number" v-model="payment" class="w-full p-2 border rounded" />
+      </div>
+      <!-- <div class="mb-4">
+        <label class="block font-medium mb-1">Enter Discount:</label>
+        <input type="number" v-model="discount" class="w-full p-2 border rounded" />
+      </div> -->
     </div>
     <div class="mb-4">
       <label class="block font-medium mb-1">Description:</label>

@@ -79,13 +79,14 @@ export default defineEventHandler(async (event) => {
       hospitalRoomNumber: fields.hospitalRoomNumber || existingRecord.hospitalRoomNumber,
       hospitalBedNumber: fields.hospitalBedNumber || existingRecord.hospitalBedNumber,
       doctorName: fields.doctorName || existingRecord.doctorName,
-      remark: fields.remark || existingRecord.remark
+      remark: fields.remark || existingRecord.remark,
+      amenities: fields.amenities || existingRecord.amenities
     };
     // console.log('updatedFields', updatedFields);
     const statement = db.prepare(`
       UPDATE bookings
       SET patientType = ?, bookingType = ?, checkInTime = ?, checkOutTime = ?, category = ?, room = ?, payment = ?, mobile = ?, guestName = ?, patientGuestRelation = ?, document = ?, gender = ?, caste = ?, age = ?, state = ?, city = ?, tehsil = ?,
-village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospitalRoomNumber = ?,  hospitalBedNumber = ?,  doctorName = ?, remark = ?
+village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospitalRoomNumber = ?,  hospitalBedNumber = ?,  doctorName = ?, remark = ?, amenities = ?
       WHERE id = ?
     `);
 
@@ -116,6 +117,7 @@ village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospita
       updatedFields.hospitalBedNumber,
       updatedFields.doctorName,
       updatedFields.remark,
+      updatedFields.amenities,
       id
     );
     // console.log('result', result);

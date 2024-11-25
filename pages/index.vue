@@ -13,7 +13,7 @@ let dashboardData = ref({
 
 let selectedCard = ref('currentBookings');
 let selectedDate = ref(new Date().toISOString().split("T")[0]);
-let roomStatus = ref('unavailable');
+let roomStatus = ref('Unavailable');
 // const bookingStore = useBookingModalStore();
 onMounted(async () => {
   await fetchLatestData()
@@ -66,8 +66,8 @@ function filterData() {
         <div class="mb-4">
           <label class="block font-medium mb-1">Select Room Status:</label>
           <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" v-model="roomStatus">
-            <option key="available" value="available">Available</option>
-            <option key="unavailable" value="unavailable">Unavailable</option>
+            <option key="available" value="Available">Available</option>
+            <option key="unavailable" value="Unavailable">Unavailable</option>
             <!-- <option v-for="option in field.options" :key="option.id" :value="option.id">{{ option.name }}</option> -->
           </select>
         </div>
@@ -108,7 +108,7 @@ function filterData() {
       <BookingsTable v-if="selectedCard == 'currentBookings'" />
       <RoomsTable v-if="selectedCard == 'roomDatabase'" />
       <BookingsTable v-if="selectedCard == 'todayBookings'" :api_url="`/api/bookings/booking?date=${selectedDate}`" />
-      <RoomsTable v-if="selectedCard == 'roomBooked'" :api_url="`/api/rooms/room/${roomStatus}`" />
+      <BookingsTable v-if="selectedCard == 'roomBooked'" :api_url="`/api/bookings/booking?status=${roomStatus}`" />
       <BookingsTable ref="bookingChild" v-if="selectedCard == 'todayCheckouts'" :api_url="`/api/bookings/booking?date=${selectedDate}&status=checkout`" />
     </div>
   </div>

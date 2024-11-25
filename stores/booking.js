@@ -25,7 +25,8 @@ var records = {
   hospitalRoomNumber: '',
   hospitalBedNumber: '',
   doctorName: '',
-  remark: ''
+  remark: '',
+  amenities: 0
 };
 function getFormattedDateWithTime(hour, minute) {
   // Get today's date

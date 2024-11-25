@@ -102,7 +102,7 @@
         </div>
       </div>
       <!-- Check-in Time, Category, Room, and Payment -->
-      <div :class="bookingStore.editMode ? 'grid grid-cols-1 md:grid-cols-6 gap-4 mt-6' : 'grid grid-cols-1 md:grid-cols-5 gap-4 mt-6'">
+      <div :class="bookingStore.editMode ? 'grid grid-cols-1 md:grid-cols-7  gap-4 mt-6' : 'grid grid-cols-1 md:grid-cols-5 gap-4 mt-6'">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Check-in Time</label>
           <input type="datetime-local" v-model="form.checkInTime" class="input-field" required />
@@ -128,8 +128,12 @@
             <option v-for="room in rooms" :key="room.id" :value="room.id">{{ room.roomNumber }}</option>
           </select>
         </div>
+        <div v-if="bookingStore.editMode">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Aminity +</label>
+          <input type="number" v-model="form.amenities" class="input-field" />
+        </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Advance Payment</label>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Advance + Payment </label>
           <input type="number" v-model="form.payment" class="input-field" />
         </div>
         <div>
@@ -506,7 +510,7 @@ async function update() {
 }
 
 #img1:target {
-  transform: scale(5);
+  transform: scale(7);
 }
 
 .close {
