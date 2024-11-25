@@ -114,7 +114,7 @@
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
 
-          <select v-model="form.category" class="input-field" required>
+          <select v-model="form.category" class="input-field" @change="getCategoryRooms(form.category)" required>
             <option v-for="category in categories" :key="category.id" :value="category.id">{{ category.name }}</option>
           </select>
         </div>
@@ -196,6 +196,7 @@
 import { useBookingModalStore } from '@/stores/booking';
 const categories = ref([]);
 const rooms = ref([]);
+const roomDB = ref([]);
 const error = ref('');
 import { useRouter } from 'vue-router';
 
@@ -206,6 +207,7 @@ onMounted(async () => {
     const cat_response = await $fetch('/api/rooms/category/all_categories');
     const { rows } = await $fetch('/api/rooms/room/available');
     categories.value = cat_response; // Adjust to match the response structure
+    roomDB.value = rows; // Adjust to match the response structure
     rooms.value = rows; // Adjust to match the response structure
     console.log('Categories:', rooms.value);
   } catch (err) {
@@ -213,7 +215,10 @@ onMounted(async () => {
     console.log('Error fetching records:', err);
   }
 });
-
+const getCategoryRooms = (category) => {
+  rooms.value = roomDB.value.filter((room) => room.roomCategory == category);
+  // console.log('Rooms:', rooms);
+};
 let imgHrf = ref('#img1');
 const toggleImage = () => {
   imgHrf.value = imgHrf.value == '#img1' ? '#' : '#img1';
