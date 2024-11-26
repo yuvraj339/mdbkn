@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     // Iterate over each field in formData
     if (formData) {
       for (const field of formData) {
-        if (field.name === 'document' && field.type && field.type.startsWith('image/')) {
+        if (field.name === 'document' && field.type && field.type === 'application/pdf') {
           const fileName = `${Date.now()}_${field.filename}`;
           uploadPath = path.join('public', 'uploads', fileName);
           fs.writeFileSync(uploadPath, field.data);

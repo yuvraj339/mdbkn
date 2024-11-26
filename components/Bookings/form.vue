@@ -2,6 +2,16 @@
   <div class="max-w-7xl mx-auto p-8 bg-white rounded-lg shadow-lg">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-lg font-semibold">{{ bookingStore.editMode ? 'Edit Booking' : 'Add Booking' }}</h2>
+      <div class="border border-dashed border-gray-500 p-1" v-if="bookingStore.editMode">
+        <a :href="form.document" target="_blank" class="text-blue-500 mr-2 size-5">
+          📄
+          <!-- Use a document icon for viewing -->
+        </a>
+        <a :href="form.document" download class="text-green-500 size-5">
+          ⬇️
+          <!-- Use a downward arrow for downloading -->
+        </a>
+      </div>
       <button @click="bookingStore.closeModel()">✖️</button>
     </div>
     <!-- <h2 class="text-1xl font-bold mb-6">Add Booking/Canteen</h2> -->
@@ -141,10 +151,10 @@
           <!-- <a :href="'public' + form.document" :download="form.document">
             <button>Download Image</button>
           </a> -->
-          <div v-if="bookingStore.editMode" class="border border-solid">
-            <a :href="imgHrf"> <img id="img1" :src="form.document" alt="Zoomable Image" @click="toggleImage" class="zoomable h-10 w-40" /> </a>
-            <!-- <a href="#" class="close"> Close Zoom</a> -->
-          </div>
+          <!-- <div v-if="bookingStore.editMode" class="border border-solid">
+            <a :href="imgHrf"> <img id="img1" :src="form.document" alt="Zoomable Image" @click="toggleImage" class="zoomable h-10 w-40" /> </a> -->
+          <!-- <a href="#" class="close"> Close Zoom</a> -->
+
           <label class="block text-sm font-medium text-gray-700 mb-2">Upload document</label>
           <input type="file" @change="handleFileUpload" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" />
         </div>
