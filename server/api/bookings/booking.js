@@ -31,14 +31,38 @@ export default defineEventHandler(async (event) => {
       }
       if (status) {
         // total booked room need to shift code to room
-        const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus
-        FROM bookings 
-        join rooms on bookings.room == rooms.id 
-        where rooms.roomStatus = ${status} 
-        `;
-        return {
-          rows
-        };
+        if (status === 'Unavailable') {
+          const { rows } = await db.sql`
+            SELECT 
+              bookings.*, 
+              rooms.roomNumber, 
+              rooms.roomStatus
+            FROM bookings
+            JOIN rooms ON bookings.room = rooms.id
+            WHERE 
+              rooms.roomStatus = ${status} 
+              AND bookings.checkOutTime IS NULL
+          `;
+          return {
+            rows
+          };
+        } else if (status === 'Available') {
+          const { rows } = await db.sql`
+            SELECT 
+             bookings.*, 
+              rooms.roomNumber, 
+              rooms.roomStatus
+            FROM rooms
+            LEFT JOIN bookings ON bookings.room = rooms.id
+            WHERE 
+              rooms.roomStatus = ${status}
+              AND (bookings.checkOutTime IS NOT NULL OR bookings.id IS NULL)
+            GROUP BY rooms.roomNumber, rooms.roomStatus
+          `;
+          return {
+            rows
+          };
+        }
 
         //   // SELECT rooms.*, name FROM rooms join room_category on rooms.roomCategory == room_category.id where rooms.roomStatus = 'Available'  order by rooms.roomNumber
         //   const { rows } =
