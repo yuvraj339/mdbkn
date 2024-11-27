@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
       if (date && status == 'checkout') {
         // todays Checkout
         const { rows } =
-          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date}`;
+          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date} order by bookings.created_at DESC`;
         return {
           rows
         };
@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
       if (date) {
         //todays booking
         const { rows } =
-          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkInTime) = ${date} `;
+          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkInTime) = ${date} order by bookings.created_at DESC`;
         return {
           rows
         };
@@ -42,6 +42,7 @@ export default defineEventHandler(async (event) => {
             WHERE 
               rooms.roomStatus = ${status} 
               AND bookings.checkOutTime IS NULL
+               order by bookings.created_at DESC
           `;
           return {
             rows
@@ -58,6 +59,7 @@ export default defineEventHandler(async (event) => {
               rooms.roomStatus = ${status}
               AND (bookings.checkOutTime IS NOT NULL OR bookings.id IS NULL)
             GROUP BY rooms.roomNumber, rooms.roomStatus
+             order by bookings.created_at DESC
           `;
           return {
             rows
@@ -72,7 +74,8 @@ export default defineEventHandler(async (event) => {
         //   };
       } else {
         // total bookings
-        const { rows } = await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id `;
+        const { rows } =
+          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id order by bookings.created_at DESC`;
         return {
           rows
         };

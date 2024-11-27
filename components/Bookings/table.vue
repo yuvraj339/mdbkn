@@ -27,8 +27,8 @@ const props = defineProps({
 // const api_url = ;
 const headers = [
   { key: 'id', label: 'ID' },
-  { key: 'patientName', label: 'Patient Name' },
   { key: 'guestName', label: 'Guest Name' },
+  { key: 'patientName', label: 'Patient Name' },
   { key: 'checkInTime', label: 'Check In' },
   { key: 'checkOutTime', label: 'Check Out' },
   { key: 'mobile', label: 'Mobile' },
