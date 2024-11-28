@@ -193,7 +193,7 @@ const checkoutRoom = async () => {
           </label>
           <label class="flex items-center">
             <input type="radio" v-model="roomPrice" :value="roomDetails[0].patientRent" class="mr-2" />
-            Patient Price
+            Cancer Patient Price
           </label>
         </div>
       </div>
