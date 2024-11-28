@@ -1,8 +1,8 @@
 const db = useDatabase('mdbkn');
 
-function updateRoomStatus(roomID, status) {
+async function updateRoomStatus(roomID, status) {
   const updateRoomStmt = db.prepare('UPDATE rooms SET roomStatus = ? WHERE id = ?');
-  updateRoomStmt.run(status, roomID);
+  await updateRoomStmt.run(status, roomID);
 }
 
 export default defineEventHandler(async (event) => {
@@ -27,7 +27,6 @@ export default defineEventHandler(async (event) => {
       totalPayment = existingPayment + additionalPayment;
       console.log(totalPayment);
     }
-    updateRoomStatus(fields_room, 'Available');
 
     try {
       // Prepare insert statement
@@ -40,7 +39,7 @@ export default defineEventHandler(async (event) => {
 
       // Insert data into the database
       const result = await statement.run(checkOutTime, remark, totalPayment, room, amenities, room);
-
+      await updateRoomStatus(fields_room, 'Available');
       // console.log('Insert Result:', result);
       return result.success > 0 ? { success: true, message: 'Record updated successfully' } : { success: false, message: 'Update failed' };
     } catch (error) {

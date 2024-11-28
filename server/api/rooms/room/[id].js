@@ -10,7 +10,8 @@ export default defineEventHandler(async (event) => {
     bookings.payment, 
     bookings.guestName, 
     bookings.checkInTime, 
-    bookings.checkOutTime
+    bookings.checkOutTime,
+    bookings.patientType
 FROM 
     rooms 
 JOIN 

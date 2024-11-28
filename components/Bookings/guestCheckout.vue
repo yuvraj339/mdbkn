@@ -41,7 +41,7 @@ const fetchRoomDetails = async () => {
   // Replace with actual API calls to get room and guest details
   const roomResponse = await $fetch(`/api/rooms/room/${selectedRoom.value}`);
   roomDetails.value = roomResponse || {};
-
+  roomPrice.value = roomDetails.value[0].patientType === 'cancer' ? roomDetails.value[0].patientRent : roomDetails.value[0].normalRent;
   // const guestResponse = await $fetch(`/api/bookings/booking/${selectedRoom.value}`);
   // guestDetails.value = guestResponse || {};
 };
@@ -125,7 +125,7 @@ const checkoutRoom = async () => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto p-4 bg-white shadow rounded" :key="key">
+  <div class="max-w-2xl mx-auto p-4 bg-white shadow rounded">
     <h2 class="text-2xl font-semibold mb-4">Final Checkout</h2>
 
     <!-- Room Number Selector -->
