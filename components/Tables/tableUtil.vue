@@ -112,10 +112,28 @@ const pdfContent = ref(null);
 //   });
 // }
 function exportToExcel() {
+  // Only format checkInTime and checkOutTime if they exist in the record
+  records.value = records.value.map((record) => ({
+    ...record,
+    ...(record.checkInTime && { checkInTime: formatDate(record.checkInTime) }),
+    ...(record.checkOutTime && { checkOutTime: formatDate(record.checkOutTime) })
+  }));
   const worksheet = XLSX.utils.json_to_sheet(records.value);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
   XLSX.writeFile(workbook, `export_${new Date().toISOString()}.xlsx`);
+}
+
+// Helper function to format date strings
+function formatDate(dateString) {
+  if (!dateString) return ''; // Handle empty or null values
+  const date = new Date(dateString);
+  if (isNaN(date)) return ''; // Handle invalid dates
+  const options = { day: 'numeric', month: 'long', year: 'numeric' };
+  return date.toLocaleDateString('en-US', options).replace(/\d{1,2}/, (d) => {
+    const suffix = d === '1' || d === '21' || d === '31' ? 'st' : d === '2' || d === '22' ? 'nd' : d === '3' || d === '23' ? 'rd' : 'th';
+    return d + suffix;
+  });
 }
 
 const deleteRecord = async (id) => {
