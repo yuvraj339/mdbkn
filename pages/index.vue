@@ -56,7 +56,6 @@ function filterData() {
 </script>
 <template>
   <div>
-    <h2 class="text-3xl font-bold mb-6">Welcome to Maheshwari Dharamshala</h2>
     <div>
       <div class="grid grid-cols-3 gap-5 p-5 mt-5 mb-5 border border-gray-200">
         <div class="mb-4">

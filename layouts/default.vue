@@ -16,6 +16,7 @@
       <!-- ===== Header Start ===== -->
       <HeaderArea />
       <!-- ===== Header End ===== -->
+      <h2 class="ml-10 text-3xl font-bold mb-6">Welcome to Maheshwari Dharamshala</h2>
 
       <!-- ===== Main Content Start ===== -->
       <main>
