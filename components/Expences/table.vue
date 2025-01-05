@@ -27,6 +27,8 @@ const headers = [
   { key: 'lightBill', label: 'Light Bill' },
   { key: 'waterBill', label: 'Water Bill' },
   { key: 'voucher', label: 'Voucher' },
+  { key: 'paidBy', label: 'Paid By' },
+  { key: 'amount', label: 'Amount' },
   { key: 'extraExpenditure', label: 'Extra Expenditure' },
   { key: 'actions', label: ['delete'] }
 ];

@@ -2,7 +2,6 @@ export default defineEventHandler(async (event) => {
   const db = useDatabase('mdbkn');
   const id = event.context.params?.id;
   if (event.node.req.method === 'DELETE') {
-    console.log(id, 'vvvvvvvvvvvvvvvvvvvvvvvvvvvvv');
     const statement = db.prepare(`DELETE FROM expences WHERE id = ?`);
     const result = statement.run(id);
 
