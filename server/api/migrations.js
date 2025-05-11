@@ -18,8 +18,13 @@ export default defineEventHandler(async (event) => {
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `;
+    // Add column booking_receipt_number to booking_payments
+    await db.sql`
+      ALTER TABLE bookings
+      ADD COLUMN booking_receipt_number TEXT DEFAULT null;
+    `;
 
-    return { success: true, message: 'Migration completed' };
+    return { success: true, message: 'Migration completed and Column old_receipt_number added successfully' };
   } catch (error) {
     return { success: false, message: error.message };
   }

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 // import { ref } from 'vue';
 var records = {
+  booking_receipt_number: '',
   patientType: '',
   bookingType: '',
   checkInTime: getFormattedDateWithTime(16, 30),

@@ -85,6 +85,11 @@
               </tr>
             </thead>
             <tbody>
+              <tr v-if="roomDetails.length > 0">
+                <td class="border px-2 py-1">{{ form.name }}</td>
+                <td class="border px-2 py-1">{{ formatDate(roomDetails[0].checkInTime) }}</td>
+                <td class="border px-2 py-1 text-right">{{ parseFloat(roomDetails[0].payment).toFixed(2) }}</td>
+              </tr>
               <tr v-for="(entry, index) in previousPayments" :key="index">
                 <td class="border px-2 py-1">{{ form.name }}</td>
                 <td class="border px-2 py-1">{{ formatDate(entry.date) }}</td>
@@ -124,6 +129,7 @@ const error = ref('');
 const roomDetails = ref(null);
 
 let previousPayments = ref([]);
+let bookingAdvanceAmount = ref(0);
 
 function print() {
   const printWindow = window.open('', '', 'width=800,height=600');
@@ -218,7 +224,8 @@ onMounted(async () => {
 });
 
 const totalAmount = computed(() => {
-  return previousPayments.value.reduce((sum, row) => sum + parseFloat(row.advance_amount), 0).toFixed(2);
+  let advancePaymentAmount = parseFloat(bookingAdvanceAmount.value) + previousPayments.value.reduce((sum, row) => sum + parseFloat(row.advance_amount), 0);
+  return advancePaymentAmount;
 });
 const getPatientDetails = async () => {
   console.log(form.roomNumber);
@@ -232,6 +239,7 @@ const getPatientDetails = async () => {
     form.bookingId = roomDetails.value[0].id || null;
     form.address = roomDetails.value[0].state + ', ' + roomDetails.value[0].city + ', ' + roomDetails.value[0].tehsil + ', ' + roomDetails.value[0].village || '';
     roomPrice.value = roomDetails.value[0].patientType === 'cancer' ? roomDetails.value[0].patientRent : roomDetails.value[0].normalRent;
+    bookingAdvanceAmount.value = roomDetails.value[0].payment || 0;
     listPayments();
   }
 

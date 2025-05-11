@@ -18,7 +18,11 @@
 
     <form @submit.prevent="createBooking">
       <!-- Patient Type and Booking Type -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex justify-between items-center space-x-4 mb-6">
+        <div class="w-[150px]">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Receipt No</label>
+          <input type="text" v-model="form.booking_receipt_number" class="input-field" />
+        </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Patient Type</label>
           <div class="flex items-center space-x-4">

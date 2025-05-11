@@ -157,8 +157,8 @@ export default defineEventHandler(async (event) => {
       INSERT INTO bookings (
         patientType, bookingType, checkInTime, category, room, payment, mobile,
         guestName, patientGuestRelation, document, gender, caste, age, state, city,tehsil,village,
-        patientName, hospital, wardNo, guestFName, hospitalRoomNumber, hospitalBedNumber, doctorName, remark, amenities
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        patientName, hospital, wardNo, guestFName, hospitalRoomNumber, hospitalBedNumber, doctorName, remark, amenities, booking_receipt_number
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
       // Insert data into the database
@@ -189,7 +189,8 @@ export default defineEventHandler(async (event) => {
         fields.hospitalBedNumber || null,
         fields.doctorName || null,
         fields.remark || null,
-        fields.amenities || null
+        fields.amenities || null,
+        fields.booking_receipt_number || null
       );
 
       // console.log('Insert Result:', result);

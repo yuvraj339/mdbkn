@@ -80,13 +80,14 @@ export default defineEventHandler(async (event) => {
       hospitalBedNumber: fields.hospitalBedNumber || existingRecord.hospitalBedNumber,
       doctorName: fields.doctorName || existingRecord.doctorName,
       remark: fields.remark || existingRecord.remark,
-      amenities: fields.amenities || existingRecord.amenities
+      amenities: fields.amenities || existingRecord.amenities,
+      booking_receipt_number: fields.booking_receipt_number || existingRecord.booking_receipt_number
     };
     // console.log('updatedFields', updatedFields);
     const statement = db.prepare(`
       UPDATE bookings
       SET patientType = ?, bookingType = ?, checkInTime = ?, checkOutTime = ?, category = ?, room = ?, payment = ?, mobile = ?, guestName = ?, patientGuestRelation = ?, document = ?, gender = ?, caste = ?, age = ?, state = ?, city = ?, tehsil = ?,
-village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospitalRoomNumber = ?,  hospitalBedNumber = ?,  doctorName = ?, remark = ?, amenities = ?
+village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospitalRoomNumber = ?,  hospitalBedNumber = ?,  doctorName = ?, remark = ?, amenities = ?, booking_receipt_number = ?
       WHERE id = ?
     `);
 
@@ -118,6 +119,7 @@ village = ?, patientName = ?, hospital = ?, wardNo = ?, guestFName = ?,  hospita
       updatedFields.doctorName,
       updatedFields.remark,
       updatedFields.amenities,
+      updatedFields.booking_receipt_number,
       id
     );
     // console.log('result', result);
