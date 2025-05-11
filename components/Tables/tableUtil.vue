@@ -5,18 +5,24 @@
     </div>
     <!-- Search Box -->
     <div v-else>
-      <div class="flex justify-between">
-        <input v-model="search" type="text" placeholder="Search..." class="p-2 border border-gray-300 rounded mb-4" />
-        <div>
-          <!-- <button @click="exportToPDF">Export to PDF</button> -->
-          <button @click="exportToExcel" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-2 rounded-lg">Export to Excel</button>
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+        <!-- Search Input -->
+        <input v-model="search" type="text" placeholder="Search..." class="p-2 border border-gray-300 rounded w-full md:w-1/3" />
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto justify-center">
+          <button @click="print" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg w-full sm:w-auto"> Print </button>
+          <button @click="exportToPDF" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg w-full sm:w-auto"> Export to PDF </button>
+          <button @click="exportToExcel" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg w-full sm:w-auto"> Export to Excel </button>
         </div>
 
-        <!-- Records per page -->
-        <div>
-          <label for="perPage">Records per page:</label>
-          <select v-model="perPage" id="perPage" class="ml-2 p-2 border border-gray-300 rounded">
-            <option v-for="option in perPageOptions" :key="option" :value="option">{{ option }}</option>
+        <!-- Records Per Page Selector -->
+        <div class="flex items-center">
+          <label for="perPage" class="mr-2">Records per page:</label>
+          <select v-model="perPage" id="perPage" class="p-2 border border-gray-300 rounded">
+            <option v-for="option in perPageOptions" :key="option" :value="option">
+              {{ option }}
+            </option>
           </select>
         </div>
       </div>
@@ -68,7 +74,8 @@
 <script setup>
 import { ref, computed, onMounted, watchEffect } from 'vue';
 import { useFetchData } from '@/composables/fetchData';
-// import jsPDF from 'jspdf';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 // Data properties
 // const records = ref([]);
@@ -100,18 +107,36 @@ const editRecord = async (data) => {
   // await fetchData('PUT', `/api/rooms/${roomId}`, updatedData);
 };
 const pdfContent = ref(null);
-// function exportToPDF() {
-//   const doc = new jsPDF();
-//   const content = pdfContent.value;
 
-//   doc.html(content, {
-//     callback: (doc) => {
-//       doc.save('example.pdf');
-//     },
-//     x: 10,
-//     y: 10
-//   });
-// }
+function exportToPDF() {
+  const doc = new jsPDF();
+
+  const data = records.value.map((record) => [
+    record.id,
+    record.guestName,
+    record.patientName,
+    formatDate(record.checkInTime),
+    formatDate(record.checkOutTime),
+    record.mobile,
+    record.city,
+    record.roomStatus,
+    record.roomNumber,
+    record.payment
+  ]);
+
+  autoTable(doc, {
+    head: [['ID', 'Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Status', 'Room Number', 'Payment']],
+    body: data,
+    styles: {
+      fontSize: 7 // adjust font size here
+    },
+    headStyles: {
+      fontSize: 8 // optional: header font size
+    }
+  });
+
+  doc.save(`export_${new Date().toISOString()}.pdf`);
+}
 function exportToExcel() {
   // Only format checkInTime and checkOutTime if they exist in the record
   records.value = records.value.map((record) => ({
@@ -125,6 +150,54 @@ function exportToExcel() {
   XLSX.writeFile(workbook, `export_${new Date().toISOString()}.xlsx`);
 }
 
+function print() {
+  const printWindow = window.open('', '', 'width=800,height=600');
+  const tableHTML = `
+    <html>
+      <head>
+        <title>Print</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 10px; font-size: 12px; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ccc; padding: 4px; text-align: left; }
+          th { background-color: #f0f0f0; }
+        </style>
+      </head>
+      <body>
+        <h2>Records</h2>
+        <h5>Print Date & Time: ${new Date().toISOString().split('T')}</h5> 
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Check In</th>
+              <th>Check Out</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${records.value
+              .map(
+                (record) => `
+              <tr>
+                <td>${record.id}</td>
+                <td>${formatDate(record.checkInTime)}</td>
+                <td>${formatDate(record.checkOutTime)}</td>
+              </tr>
+            `
+              )
+              .join('')}
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `;
+
+  printWindow.document.write(tableHTML);
+  printWindow.document.close();
+  printWindow.focus();
+  // printWindow.print();
+  // printWindow.close();
+}
 // Helper function to format date strings
 function formatDate(dateString) {
   if (!dateString) return ''; // Handle empty or null values

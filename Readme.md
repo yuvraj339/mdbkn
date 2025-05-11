@@ -26,4 +26,4 @@ Export-PfxCertificate -FilePath "C:\certificate.pfx" -Password $password
 
 ## npm install xlsx
 
-## npm install jspdf
+## npm install jspdf jspdf-autotable

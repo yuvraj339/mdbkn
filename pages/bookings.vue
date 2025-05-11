@@ -6,6 +6,7 @@
       <div class="flex space-x-4">
         <!-- <button @click="exportData('pdf')" class="btn btn-primary">Export PDF</button>
           <button @click="exportData('excel')" class="btn btn-primary">Export Excel</button> -->
+        <BookingsAdvancePaymentModal />
         <button @click="add" class="btn btn-primary">Add Booking +</button>
       </div>
     </div>

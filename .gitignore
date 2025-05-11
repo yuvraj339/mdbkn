@@ -16,3 +16,4 @@ debug.log
 *.log
 debug.json
 errors.json
+.data/db.sqlite3

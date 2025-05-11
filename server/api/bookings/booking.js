@@ -11,27 +11,24 @@ function updateRoomStatus(roomID, status) {
 export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
     const query = getQuery(event);
-    const { date, status } = query;
+    const { fromDate, toDate, roomStatus, type } = query;
+
     try {
-      if (date && status == 'checkout') {
-        // todays Checkout
-        const { rows } =
-          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date} order by bookings.created_at DESC`;
-        return {
-          rows
-        };
+      if (fromDate && toDate) {
+        const dateField = type === 'todayCheckouts' ? 'checkOutTime' : 'checkInTime';
+        const { rows } = await db.sql`
+          SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+          FROM bookings 
+          JOIN rooms ON bookings.room = rooms.id 
+          WHERE DATE(bookings.${db.sql(dateField)}) >= ${fromDate} 
+            AND DATE(bookings.${db.sql(dateField)}) <= ${toDate} 
+          ORDER BY bookings.created_at DESC
+        `;
+        return { rows };
       }
-      if (date) {
-        //todays booking
-        const { rows } =
-          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkInTime) = ${date} order by bookings.created_at DESC`;
-        return {
-          rows
-        };
-      }
-      if (status) {
+      if (roomStatus) {
         // total booked room need to shift code to room
-        if (status === 'Unavailable') {
+        if (roomStatus === 'Unavailable') {
           const { rows } = await db.sql`
             SELECT 
               bookings.*, 
@@ -40,14 +37,14 @@ export default defineEventHandler(async (event) => {
             FROM bookings
             JOIN rooms ON bookings.room = rooms.id
             WHERE 
-              rooms.roomStatus = ${status} 
+              rooms.roomStatus = ${roomStatus} 
               AND bookings.checkOutTime IS NULL
                order by bookings.created_at DESC
           `;
           return {
             rows
           };
-        } else if (status === 'Available') {
+        } else if (roomStatus === 'Available') {
           const { rows } = await db.sql`
             SELECT 
              bookings.*, 
@@ -56,7 +53,7 @@ export default defineEventHandler(async (event) => {
             FROM rooms
             LEFT JOIN bookings ON bookings.room = rooms.id
             WHERE 
-              rooms.roomStatus = ${status}
+              rooms.roomStatus = ${roomStatus}
               AND (bookings.checkOutTime IS NOT NULL OR bookings.id IS NULL)
             GROUP BY rooms.roomNumber, rooms.roomStatus
              order by bookings.created_at DESC
@@ -68,7 +65,7 @@ export default defineEventHandler(async (event) => {
 
         //   // SELECT rooms.*, name FROM rooms join room_category on rooms.roomCategory == room_category.id where rooms.roomStatus = 'Available'  order by rooms.roomNumber
         //   const { rows } =
-        //   await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${date}`;
+        //   await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${fromDate}`;
         //   return {
         //     rows
         //   };

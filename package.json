@@ -91,6 +91,8 @@
     "electron-log": "^5.2.0",
     "electron-updater": "^6.3.9",
     "express": "^4.21.1",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
     "jwt-decode": "^4.0.0",
     "xlsx": "^0.18.5"
   }

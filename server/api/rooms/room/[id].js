@@ -8,7 +8,12 @@ export default defineEventHandler(async (event) => {
     room_category.normalRent, 
     room_category.patientRent,
     bookings.payment, 
+    bookings.id, 
     bookings.guestName, 
+    bookings.state, 
+    bookings.city, 
+    bookings.tehsil, 
+    bookings.village, 
     bookings.checkInTime, 
     bookings.checkOutTime,
     bookings.patientType

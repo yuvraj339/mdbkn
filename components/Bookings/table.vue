@@ -15,7 +15,6 @@ const bookingStore = useBookingModalStore();
 const tableChild = ref(null);
 
 const refreshTableChildren = () => {
-  alert(1);
   tableChild.value.fetchData();
 };
 const props = defineProps({
