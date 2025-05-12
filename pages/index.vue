@@ -22,10 +22,12 @@ onMounted(async () => {
 });
 async function fetchLatestData() {
   try {
-    const response = await $fetch('/api/dashboard/alldata');
-    // const cat_response = await $fetch('/api/rooms/category/all_categories');
-    // categories.value = cat_response; // Adjust to match the response structure
-    // rooms.value = room_response; // Adjust to match the response structure
+    let endPoint = '/api/dashboard/alldata';
+    if (fromDate.value){
+      endPoint = `/api/dashboard/alldata?fromDate=${fromDate.value}&toDate=${toDate.value}`;
+    }
+    const response = await $fetch(endPoint);
+
     console.log('response:', response);
     dashboardData.value = response
   } catch (err) {
@@ -44,19 +46,6 @@ async function showData(relatedTo) {
   } else {
     apiUrl.value = '/api/bookings/booking'
   }
-  alert(apiUrl.value)
-
-  // try {
-  //   const response = await $fetch(`/api/dashboard/${relatedTo}`);
-  //   // const cat_response = await $fetch('/api/rooms/category/all_categories');
-  //   // categories.value = cat_response; // Adjust to match the response structure
-  //   // rooms.value = room_response; // Adjust to match the response structure
-  //   console.log('response:', response);
-  //   // dashboardData.value = response
-  // } catch (err) {
-  //   error.value = err.message;
-  //   console.log('Error fetching records:', err);
-  // }
 }
 // const bookingChild = ref(null);
 
@@ -82,8 +71,9 @@ function setFilter() {
         <div class="mb-4">
           <label class="font-medium mb-1">Room Status:</label>
           <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-200" v-model="roomStatus">
-            <option key="available" value="Available">Available</option>
-            <option key="unavailable" value="Unavailable">Unavailable</option>
+            <option key="available" value="both">Both</option>
+            <option key="unavailable" value="Unavailable">Check-in</option>
+            <option key="available" value="Available">Check-out</option>
             <!-- <option v-for="option in field.options" :key="option.id" :value="option.id">{{ option.name }}</option> -->
           </select>
         </div>
@@ -97,30 +87,38 @@ function setFilter() {
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-3 gap-6">
-      <div class="bg-yellow-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('currentBookings')">
+    <div class="grid grid-cols-4 gap-6">
+      <div class="bg-yellow-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('currentBookings')">
         <h3 class="text-2xl font-bold">{{ dashboardData.currentBookings }}</h3>
-        <p>Current Bookings</p>
+        <p>Bookings</p>
       </div>
-      <div class="bg-blue-300 text-white p-6 rounded shadow cursor-pointer" @click="showData('roomDatabase')">
+      <div class="bg-blue-300 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('roomDatabase')">
         <h3 class="text-2xl font-bold">{{ dashboardData.roomDatabase }}</h3>
         <p>Room Database</p>
       </div>
-      <div class="bg-gray-500 text-white p-6 rounded shadow cursor-pointer" @click="showData('todayBookings')">
+      <!-- <div class="bg-gray-500 text-white p-6 rounded shadow cursor-pointer" @click="showData('todayBookings')">
         <h3 class="text-2xl font-bold">{{ dashboardData.todayBookings }}</h3>
         <p>Booking</p>
-      </div>
-      <div class="bg-teal-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('roomBooked')">
+      </div> -->
+      <div class="bg-teal-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('roomBooked')">
         <h3 class="text-2xl font-bold">{{ dashboardData.roomBooked }}</h3>
         <p>Room Booked</p>
       </div>
-      <div class="bg-green-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('todayCheckouts')">
+      <!-- <div class="bg-green-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('todayCheckouts')">
         <h3 class="text-2xl font-bold">{{ dashboardData.todayCheckouts }}</h3>
         <p>Checkouts</p>
-      </div>
-      <div class="bg-pink-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('dueBalance')">
-        <h3 class="text-2xl font-bold">{{ dashboardData.dueBalance }}</h3>
+      </div> -->
+      <div class="bg-pink-500 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('dueBalance')">
+        <h3 class="text-2xl font-bold">₹{{ dashboardData.dueBalance.dueAmount }}</h3>
         <p>Due Balance</p>
+        <!-- <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+          <div><span class="font-medium">Days:</span> {{ dashboardData.dueBalance.totalDays }}</div>
+          <div><span class="font-medium">Rent:</span> ₹{{ dashboardData.dueBalance.totalRent }}</div>
+          <div><span class="font-medium">Advance:</span> ₹{{ dashboardData.dueBalance.totalAdvance }}</div>
+          <div
+            ><span class="font-medium">Due Amount:</span> <span class="font-bold"> ₹{{ dashboardData.dueBalance.dueAmount }}</span></div
+          >
+        </div> -->
       </div>
     </div>
 

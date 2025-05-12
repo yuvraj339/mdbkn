@@ -1,14 +1,14 @@
 import { ref } from 'vue';
-import { useFetch } from 'nuxt/app';
 
-export function useFetchData(apiURL) {
+export function useFetchData(apiURLRef) {
   const records = ref([]);
   const error = ref(null);
 
   async function fetchData() {
     try {
-      const { data } = await useFetch(apiURL);
-      records.value = data.value['rows'];
+      const res = await fetch(apiURLRef.value);
+      const data = await res.json();
+      records.value = data.rows; // Adjust if your API returns differently
     } catch (err) {
       error.value = err.message;
       console.error('Error fetching records:', err);
@@ -17,3 +17,5 @@ export function useFetchData(apiURL) {
 
   return { records, fetchData, error };
 }
+// const { data } = await useFetch(apiURL);
+// records.value = data.value['rows'];

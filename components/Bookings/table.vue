@@ -7,10 +7,6 @@
 <script setup>
 import { useBookingModalStore } from '@/stores/booking';
 const bookingStore = useBookingModalStore();
-// console.log(typeof categoryStore, 'categoryStore')
-// function addCategory() {
-//   categoryStore.toggleModal()
-// }
 
 const tableChild = ref(null);
 

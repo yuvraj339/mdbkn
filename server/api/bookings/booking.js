@@ -11,72 +11,99 @@ function updateRoomStatus(roomID, status) {
 export default defineEventHandler(async (event) => {
   if (event.node.req.method === 'GET') {
     const query = getQuery(event);
-    const { fromDate, toDate, roomStatus, type } = query;
+    const { fromDate, toDate, status, type } = query;
 
     try {
-      if (fromDate && toDate) {
-        const dateField = type === 'todayCheckouts' ? 'checkOutTime' : 'checkInTime';
+      // 1. Rooms that are booked and still occupied
+      if (type === 'roomBooked') {
         const { rows } = await db.sql`
           SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
           FROM bookings 
           JOIN rooms ON bookings.room = rooms.id 
-          WHERE DATE(bookings.${db.sql(dateField)}) >= ${fromDate} 
-            AND DATE(bookings.${db.sql(dateField)}) <= ${toDate} 
-          ORDER BY bookings.created_at DESC
+          WHERE rooms.roomStatus = 'Unavailable'
+            AND bookings.checkOutTime IS NULL
+          ORDER BY rooms.roomNumber ASC
         `;
         return { rows };
       }
-      if (roomStatus) {
-        // total booked room need to shift code to room
-        if (roomStatus === 'Unavailable') {
-          const { rows } = await db.sql`
-            SELECT 
-              bookings.*, 
-              rooms.roomNumber, 
-              rooms.roomStatus
-            FROM bookings
-            JOIN rooms ON bookings.room = rooms.id
-            WHERE 
-              rooms.roomStatus = ${roomStatus} 
-              AND bookings.checkOutTime IS NULL
-               order by bookings.created_at DESC
-          `;
-          return {
-            rows
-          };
-        } else if (roomStatus === 'Available') {
-          const { rows } = await db.sql`
-            SELECT 
-             bookings.*, 
-              rooms.roomNumber, 
-              rooms.roomStatus
-            FROM rooms
-            LEFT JOIN bookings ON bookings.room = rooms.id
-            WHERE 
-              rooms.roomStatus = ${roomStatus}
-              AND (bookings.checkOutTime IS NOT NULL OR bookings.id IS NULL)
-            GROUP BY rooms.roomNumber, rooms.roomStatus
-             order by bookings.created_at DESC
-          `;
-          return {
-            rows
-          };
-        }
 
-        //   // SELECT rooms.*, name FROM rooms join room_category on rooms.roomCategory == room_category.id where rooms.roomStatus = 'Available'  order by rooms.roomNumber
-        //   const { rows } =
-        //   await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id WHERE DATE(bookings.checkOutTime) = ${fromDate}`;
-        //   return {
-        //     rows
-        //   };
-      } else {
-        // total bookings
-        const { rows } =
-          await db.sql`SELECT bookings.*, rooms.roomNumber, rooms.roomStatus FROM bookings join rooms on bookings.room == rooms.id order by bookings.created_at DESC`;
-        return {
-          rows
-        };
+      // 2. Current Bookings
+      if (type === 'currentBookings') {
+        if (status === 'Available') {
+          const { rows } = await db.sql`
+            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+            FROM bookings 
+            JOIN rooms ON bookings.room = rooms.id 
+            WHERE DATE(bookings.checkOutTime) >= ${fromDate} 
+              AND DATE(bookings.checkOutTime) <= ${toDate}
+              AND rooms.roomStatus = 'Available'
+              AND bookings.checkOutTime IS NOT NULL
+            ORDER BY rooms.roomNumber ASC
+          `;
+          return { rows };
+        } else if (status === 'Unavailable') {
+          const { rows } = await db.sql`
+            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+            FROM bookings 
+            JOIN rooms ON bookings.room = rooms.id 
+            WHERE DATE(bookings.checkInTime) >= ${fromDate} 
+              AND DATE(bookings.checkInTime) <= ${toDate}
+              AND rooms.roomStatus = 'Unavailable'
+              AND bookings.checkOutTime IS NULL
+            ORDER BY rooms.roomNumber ASC
+          `;
+          return { rows };
+        } else {
+          const { rows } = await db.sql`
+            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+            FROM bookings 
+            JOIN rooms ON bookings.room = rooms.id 
+            WHERE (
+                  (DATE(bookings.checkInTime) >= ${fromDate} AND DATE(bookings.checkInTime) <= ${toDate})
+                  OR 
+                  (DATE(bookings.checkOutTime) >= ${fromDate} AND DATE(bookings.checkOutTime) <= ${toDate})
+              )
+            ORDER BY rooms.roomNumber ASC
+          `;
+          return { rows };
+        }
       }
+
+      // 4. due Balance
+      if (type === 'dueBalance') {
+        const { rows } = await db.sql`
+                      SELECT 
+                        b.id,
+                        b.patientName,
+                        b.guestName,
+                        b.patientType,
+                        b.checkInTime,
+                        b.checkOutTime,
+                        r.roomNumber,
+                        rc.name AS roomCategory,
+                        CASE 
+                          WHEN b.patientType = 'cancer' THEN rc.patientRent
+                          ELSE rc.normalRent
+                        END AS daily_rent,
+                        bp.advance_amount as advance_payment,
+                        b.payment AS init_advance_payment
+                      FROM bookings b
+                      JOIN rooms r ON b.room = r.id
+                      JOIN room_category rc ON r.roomCategory = rc.id
+                      LEFT JOIN booking_payments bp 
+                        ON b.id = bp.booking_id
+                      WHERE b.checkOutTime IS NULL;
+        `;
+        return { rows };
+      }
+      // 5. Default - return all bookings
+      const { rows } = await db.sql`
+          SELECT bookings.*, rooms.roomNumber, rooms.roomStatus
+          FROM bookings 
+          JOIN rooms ON bookings.room = rooms.id 
+          ORDER BY bookings.created_at DESC
+      `;
+      return { rows };
     } catch (err) {
       return {
         status: 500,

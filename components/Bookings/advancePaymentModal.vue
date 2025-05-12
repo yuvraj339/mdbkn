@@ -85,7 +85,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="roomDetails.length > 0">
+              <tr v-if="roomDetails && roomDetails.length > 0">
                 <td class="border px-2 py-1">{{ form.name }}</td>
                 <td class="border px-2 py-1">{{ formatDate(roomDetails[0].checkInTime) }}</td>
                 <td class="border px-2 py-1 text-right">{{ parseFloat(roomDetails[0].payment).toFixed(2) }}</td>

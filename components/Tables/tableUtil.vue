@@ -91,11 +91,16 @@ const props = defineProps({
   store: Object
 });
 
-const { records, fetchData, error } = useFetchData(props.apiURL);
+const apiUrlRef = computed(() => props.apiURL); // make it reactive
+const { records, fetchData, error } = useFetchData(apiUrlRef);
 
-watchEffect(() => {
-  records.value; // Watch for changes
-});
+watch(
+  () => props.apiURL,
+  () => {
+    fetchData(); // call fetchData when apiURL changes
+  },
+  { immediate: true }
+); // run immediately on component mount
 const editRecord = async (data) => {
   console.log(JSON.parse(JSON.stringify(data)));
   props.store.setRecord(JSON.parse(JSON.stringify(data)));
@@ -111,21 +116,21 @@ const pdfContent = ref(null);
 function exportToPDF() {
   const doc = new jsPDF();
 
+  // Bookings Table
   const data = records.value.map((record) => [
-    record.id,
     record.guestName,
     record.patientName,
     formatDate(record.checkInTime),
     formatDate(record.checkOutTime),
     record.mobile,
     record.city,
-    record.roomStatus,
+    // record.roomStatus,
     record.roomNumber,
     record.payment
   ]);
 
   autoTable(doc, {
-    head: [['ID', 'Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Status', 'Room Number', 'Payment']],
+    head: [['Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Number', 'Payment']],
     body: data,
     styles: {
       fontSize: 7 // adjust font size here
@@ -152,6 +157,7 @@ function exportToExcel() {
 
 function print() {
   const printWindow = window.open('', '', 'width=800,height=600');
+  let i = 1; // Initialize the counter variable
   const tableHTML = `
     <html>
       <head>
@@ -165,13 +171,17 @@ function print() {
       </head>
       <body>
         <h2>Records</h2>
-        <h5>Print Date & Time: ${new Date().toISOString().split('T')}</h5> 
+        <h4>Print Date & Time: ${new Date().toISOString().split('T')}</h4> 
         <table>
           <thead>
             <tr>
-              <th>Name</th>
+              <th>S/N</th>
+              <th>Room</th>
+              <th>Guest Name</th>
+              <th>Mobile</th>
               <th>Check In</th>
-              <th>Check Out</th>
+              <th>Patient Name</th>
+              <th>Ward</th>
             </tr>
           </thead>
           <tbody>
@@ -179,9 +189,13 @@ function print() {
               .map(
                 (record) => `
               <tr>
-                <td>${record.id}</td>
+                <td>${i++}</td>
+                <td>${record.roomNumber}</td>
+                <td>${record.guestName}</td>
+                <td>${record.mobile}</td>
                 <td>${formatDate(record.checkInTime)}</td>
-                <td>${formatDate(record.checkOutTime)}</td>
+                <td>${record.patientName}</td>
+                <td>${record.wardNo}</td>
               </tr>
             `
               )
