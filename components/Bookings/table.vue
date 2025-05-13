@@ -10,27 +10,61 @@ const bookingStore = useBookingModalStore();
 
 const tableChild = ref(null);
 
-const refreshTableChildren = () => {
-  tableChild.value.fetchData();
-};
+// const refreshTableChildren = () => {
+//   tableChild.value.fetchData();
+// };
 const props = defineProps({
   api_url: {
     type: String,
     default: '/api/bookings/booking' // Set your default URL here
   }
 });
-// const api_url = ;
-const headers = [
+
+const headers = ref([
   { key: 'id', label: 'ID' },
   { key: 'guestName', label: 'Guest Name' },
   { key: 'patientName', label: 'Patient Name' },
   { key: 'checkInTime', label: 'Check In' },
-  { key: 'checkOutTime', label: 'Check Out' },
   { key: 'mobile', label: 'Mobile' },
-  { key: 'city', label: 'City' },
-  { key: 'roomStatus', label: 'Room Status' },
   { key: 'roomNumber', label: 'Room Number' },
-  { key: 'payment', label: 'Payment' },
-  { key: 'actions', label: ['edit', 'delete'] }
-];
+  { key: 'payment', label: 'Payment' }
+]);
+
+watch(
+  () => props.api_url,
+  () => {
+    updateHeader();
+  },
+  { immediate: true }
+);
+
+function updateHeader() {
+  // Reset to default headers
+  headers.value = [
+    { key: 'id', label: 'ID' },
+    { key: 'guestName', label: 'Guest Name' },
+    { key: 'patientName', label: 'Patient Name' },
+    { key: 'checkInTime', label: 'Check In' },
+    { key: 'mobile', label: 'Mobile' },
+    { key: 'roomNumber', label: 'Room Number' },
+    { key: 'payment', label: 'Payment' }
+  ];
+
+  let queryString = props.api_url.split('?');
+
+  let type = 'currentBookings'; // Default
+  if (queryString.length > 1) {
+    const params = new URLSearchParams(queryString[1]);
+    type = params.get('type') || type;
+  }
+
+  if (type !== 'dueBalance') {
+    headers.value.push(
+      { key: 'city', label: 'City' },
+      { key: 'roomStatus', label: 'Room Status' },
+      { key: 'checkOutTime', label: 'Check Out' },
+      { key: 'actions', label: ['edit', 'delete'] }
+    );
+  }
+}
 </script>

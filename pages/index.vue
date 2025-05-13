@@ -38,13 +38,12 @@ async function fetchLatestData() {
 async function showData(relatedTo) {
   selectedCard.value = relatedTo
 
-  if(selectedCard.value != 'currentBookings') {
-    apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&type=' + selectedCard.value
-  }
-  else if(selectedCard.value != 'roomBooked') {
-    apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&status=' + roomStatus.value + '&type=' + selectedCard.value
-  } else {
-    apiUrl.value = '/api/bookings/booking'
+  if(selectedCard.value == 'roomBooked') {
+      apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&type=' + selectedCard.value
+  }  else if(selectedCard.value == 'currentBookings' || selectedCard.value == 'dueBalance') {
+      apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&status=' + roomStatus.value + '&type=' + selectedCard.value
+  }  else {
+      apiUrl.value = '/api/bookings/booking'
   }
 }
 // const bookingChild = ref(null);

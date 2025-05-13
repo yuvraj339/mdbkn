@@ -52,7 +52,7 @@ export default defineEventHandler(async (event) => {
     const todayCheckoutsCount = bookings.filter((booking) => isToday(new Date(booking.checkOutTime))).length;
 
     const today = new Date();
-
+    let totalDueAmount = 0;
     const dueBalance = dueBalanceResult.rows.map((row) => {
       const checkInDate = new Date(row.checkInTime);
 
@@ -65,7 +65,7 @@ export default defineEventHandler(async (event) => {
       const advance2 = parseFloat(row.advance_payment || 0);
 
       const dueAmount = totalRent - advance1 - advance2;
-
+      totalDueAmount += dueAmount;
       return {
         totalDays: diffDays,
         totalRent,
@@ -73,7 +73,7 @@ export default defineEventHandler(async (event) => {
         dueAmount
       };
     });
-    const lastDueBalance = dueBalance.at(0);
+    // const lastDueBalance = dueBalance.at(0);
 
     return {
       currentBookings: currentBookingsCount,
@@ -81,7 +81,7 @@ export default defineEventHandler(async (event) => {
       todayBookings: todayBookingsCount,
       roomBooked: roomBookedCount,
       todayCheckouts: todayCheckoutsCount,
-      dueBalance: lastDueBalance
+      dueBalance: { dueAmount: totalDueAmount }
     };
   }
 });

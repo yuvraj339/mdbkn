@@ -156,6 +156,18 @@ function exportToExcel() {
 }
 
 function print() {
+  let queryString = props.apiURL.split('?');
+
+  let type = 'currentBookings'; // Default
+  let toDate = '';
+  let fromDate = '';
+  if (queryString.length > 1) {
+    const params = new URLSearchParams(queryString[1]);
+    type = params.get('type') || type;
+    fromDate = params.get('fromDate') || '';
+    toDate = params.get('toDate') || '';
+  }
+
   const printWindow = window.open('', '', 'width=800,height=600');
   let i = 1; // Initialize the counter variable
   const tableHTML = `
@@ -163,15 +175,15 @@ function print() {
       <head>
         <title>Print</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 10px; font-size: 12px; }
+          body { font-family: Arial, sans-serif; padding: 10px; font-size: 10px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #ccc; padding: 4px; text-align: left; }
           th { background-color: #f0f0f0; }
         </style>
       </head>
       <body>
-        <h2>Records</h2>
-        <h4>Print Date & Time: ${new Date().toISOString().split('T')}</h4> 
+        <h2>Records ${fromDate != '' && type != 'dueBalance' ? `From ${fromDate} - ${toDate}` : ''}</h2>
+        <h4>Print Date & Time: ${new Date().toISOString().split('T')}</h4>
         <table>
           <thead>
             <tr>
@@ -181,7 +193,7 @@ function print() {
               <th>Mobile</th>
               <th>Check In</th>
               <th>Patient Name</th>
-              <th>Ward</th>
+              ${type != 'dueBalance' ? '<th>Ward No</th>' : '<th>Pending Amount</th>'}
             </tr>
           </thead>
           <tbody>
@@ -195,7 +207,8 @@ function print() {
                 <td>${record.mobile}</td>
                 <td>${formatDate(record.checkInTime)}</td>
                 <td>${record.patientName}</td>
-                <td>${record.wardNo}</td>
+                ${type != 'dueBalance' ? `<td>${record.wardNo}</td>` : `<td>${record.payment}</td>`}
+
               </tr>
             `
               )
