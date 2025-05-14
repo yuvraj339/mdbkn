@@ -19,7 +19,7 @@
 
       <!-- ===== Main Content Start ===== -->
       <main>
-        <div class="mx-auto max-w-screen-2xl p-4 md:p-6 bg-slate-100">
+        <div class="mx-auto max-w-screen-2xl p-4 md:p-6 bg-slate-100 shadow-lg">
           <slot></slot>
           <!-- <NuxtPage /> -->
         </div>

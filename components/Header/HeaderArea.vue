@@ -14,8 +14,8 @@ import DropdownUser from './DropdownUser.vue';
 }
 </style>
 <template>
-  <header class="sticky top-0 z-999 flex w-full shadow-2 bg-slate-300 duration-300 ease-linear drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
-    <div class="flex flex-grow items-center justify-end shadow-2 md:px-6 2xl:px-11">
+  <header class="sticky top-0 z-999 flex w-full shadow-sm bg-slate-300 duration-300 ease-linear drop-shadow-1 dark:bg-boxdark dark:drop-shadow-none">
+    <div class="flex flex-grow items-center justify-end md:px-6 2xl:px-11">
       <div class="flex items-center gap-3 2xsm:gap-7 justify-between w-full">
         <h2 class="ml-10 text-2xl font-bold m-2 text-cyan-800">Maheshwari Dharamshala</h2>
 

@@ -28,7 +28,7 @@ const handleItemClick = () => {
       @click.prevent="handleItemClick"
       class="group relative flex items-center gap-2 rounded-md px-4 py-2 font-medium text-gray-700 dark:text-gray-300 transition-all duration-200 hover:bg-gray-100 hover:dark:bg-gray-700"
       :class="{
-        'bg-blue-100 text-blue-700 dark:bg-gray-800 dark:text-white': sidebarStore.page === item.label
+        'bg-blue-100 text-blue-700 dark:bg-gray-800 dark:text-white shadow-md': sidebarStore.page === item.label
       }"
     >
       <span v-html="item.icon" class="text-lg transition-all duration-200 group-hover:scale-110"></span>
