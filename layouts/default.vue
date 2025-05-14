@@ -16,11 +16,10 @@
       <!-- ===== Header Start ===== -->
       <HeaderArea />
       <!-- ===== Header End ===== -->
-      <h2 class="ml-10 text-3xl font-bold mb-6">Welcome to Maheshwari Dharamshala</h2>
 
       <!-- ===== Main Content Start ===== -->
       <main>
-        <div class="mx-auto max-w-screen-2xl p-4 md:p-6">
+        <div class="mx-auto max-w-screen-2xl p-4 md:p-6 bg-slate-100">
           <slot></slot>
           <!-- <NuxtPage /> -->
         </div>
