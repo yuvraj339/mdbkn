@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-center justify-center min-h-screen bg-gray-100">
+  <div class="flex items-center justify-center bg-gray-100">
     <form @submit.prevent="updateProfile" class="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm">
       <h2 class="text-2xl font-semibold text-gray-800 mb-6">Update Profile</h2>
       <div class="mb-4">

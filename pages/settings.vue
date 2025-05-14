@@ -25,7 +25,7 @@ const exportDB = async () => {
 </template> -->
 <template>
   <div>
-    <button @click="downloadDB" class="w-[200px] bg-blue-500 hover:bg-blue-600 text-white p-3 my-3 rounded-lg">Export Database</button>
+    <div class="flex justify-end"><button @click="downloadDB" class="w-[200px] bg-blue-500 hover:bg-blue-600 text-white p-3 my-3 rounded-lg">Export Database</button></div>
     <AuthProfile />
   </div>
 </template>
