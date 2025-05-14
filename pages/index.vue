@@ -86,11 +86,19 @@ function setFilter() {
         </div>
       </div>
       <div class="grid grid-cols-5 gap-6 p-4">
-        <div class="bg-yellow-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('currentBookings')">
+        <div
+          class="bg-yellow-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105"
+          :class="{ 'scale-110 border-solid border-2 border-gray-700': selectedCard == 'currentBookings' }"
+          @click="showData('currentBookings')"
+        >
           <h3 class="text-2xl font-bold">{{ dashboardData.currentBookings }}</h3>
           <p>Bookings</p>
         </div>
-        <div class="bg-blue-300 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('roomDatabase')">
+        <div
+          class="bg-blue-300 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105"
+          :class="{ 'scale-110 border-solid border-2 border-gray-700': selectedCard == 'roomDatabase' }"
+          @click="showData('roomDatabase')"
+        >
           <h3 class="text-2xl font-bold">{{ dashboardData.roomDatabase }}</h3>
           <p>Rooms</p>
         </div>
@@ -98,15 +106,27 @@ function setFilter() {
         <h3 class="text-2xl font-bold">{{ dashboardData.todayBookings }}</h3>
         <p>Booking</p>
       </div> -->
-        <div class="bg-teal-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('roomBooked')">
+        <div
+          class="bg-teal-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105"
+          :class="{ 'scale-110 border-solid border-2 border-gray-700': selectedCard == 'roomBooked' }"
+          @click="showData('roomBooked')"
+        >
           <h3 class="text-2xl font-bold">{{ dashboardData.roomBooked }}</h3>
           <p>Booked Rooms</p>
         </div>
-        <div class="bg-orange-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('cashBook')">
+        <div
+          class="bg-orange-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105"
+          :class="{ 'scale-110 border-solid border-2 border-gray-700': selectedCard == 'cashBook' }"
+          @click="showData('cashBook')"
+        >
           <h3 class="text-2xl font-bold">{{ dashboardData.todayCheckouts }}</h3>
           <p>Cash Book</p>
         </div>
-        <div class="bg-green-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('dueBalance')">
+        <div
+          class="bg-green-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105"
+          :class="{ 'scale-110 border-solid border-2 border-gray-700': selectedCard == 'dueBalance' }"
+          @click="showData('dueBalance')"
+        >
           <h3 class="text-2xl font-bold">₹{{ dashboardData.dueBalance.dueAmount }}</h3>
           <p>Due Balance</p>
           <!-- <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">

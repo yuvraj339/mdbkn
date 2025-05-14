@@ -47,7 +47,6 @@ function updateHeader() {
     const params = new URLSearchParams(queryString[1]);
     type = params.get('type') || type;
   }
-  alert(type);
   if (type == 'dueBalance') {
     headers.value.push(
       { key: 'mobile', label: 'Mobile' },

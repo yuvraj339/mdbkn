@@ -141,10 +141,11 @@ function print() {
       <head>
         <title>Print</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
+          body { font-family: Arial, sans-serif; padding: 10px; font-size: 10px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-          th { background-color: #f0f0f0; }
+          th, td { border: 1px solid #ccc; padding: 4px; text-align: left; }
+          th { background-color: #f0f0f0; font-size: 12px; }
+          td { font-size: 12px; }
         </style>
       </head>
       <body>

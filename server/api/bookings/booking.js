@@ -71,44 +71,57 @@ export default defineEventHandler(async (event) => {
 
       // 4. due Balance
       if (type === 'dueBalance') {
-        const dueBalanceResult = await db.sql`
-                      SELECT 
-                          b.id,
-                          b.patientName,
-                          b.guestName,
-                          b.mobile,
-                          b.patientType,
-                          b.checkInTime,
-                          b.checkOutTime,
-                          r.roomNumber,
-                          rc.name AS roomCategory,
-                          CASE 
-                            WHEN b.patientType = 'cancer' THEN rc.patientRent
-                            ELSE rc.normalRent
-                          END AS daily_rent,
-                          COALESCE(SUM(bp.advance_amount), 0) AS advance_payment,
-                          b.payment AS init_advance_payment
-                        FROM bookings b
-                        JOIN rooms r ON b.room = r.id
-                        JOIN room_category rc ON r.roomCategory = rc.id
-                        LEFT JOIN booking_payments bp ON b.id = bp.booking_id
-                        WHERE b.checkOutTime IS NULL
-                        GROUP BY 
-                          b.id, b.patientName, b.guestName, b.mobile, b.patientType, 
-                          b.checkInTime, b.checkOutTime, r.roomNumber, rc.name, rc.patientRent, 
-                          rc.normalRent, b.payment;
-           `;
-        const today = new Date();
-        const rows = dueBalanceResult.rows.map((row) => {
-          const checkInDate = new Date(row.checkInTime);
+        const bookingResult = await db.sql`
+              SELECT 
+                b.id,
+                b.patientName,
+                b.guestName,
+                b.mobile,
+                b.patientType,
+                b.checkInTime,
+                b.checkOutTime,
+                r.roomNumber,
+                rc.name AS roomCategory,
+                CASE 
+                  WHEN b.patientType = 'cancer' THEN rc.patientRent
+                  ELSE rc.normalRent
+                END AS daily_rent,
+                b.payment AS init_advance_payment
+              FROM bookings b
+              JOIN rooms r ON b.room = r.id
+              JOIN room_category rc ON r.roomCategory = rc.id
+              WHERE b.checkOutTime IS NULL
+            `;
+        // const bookingIds = bookingResult.rows.map((row) => row.id);
+        // if (bookingIds.length === 0) {
+        //   return { rows: [] };
+        // }
+        // const mappedBookingIds = bookingIds.map((id) => id).join(',');
+        // 2. Get advance payments for all bookings
+        const advancePaymentsResult = await db.sql`
+              SELECT 
+                booking_id,
+                COALESCE(SUM(advance_amount), 0) AS advance_payment
+              FROM booking_payments
+              GROUP BY booking_id
+            `;
 
-          // Calculate days between check-in and today (inclusive of current day)
+        // Convert advance payments into a lookup map
+        const advancePaymentsMap = {};
+        advancePaymentsResult.rows.forEach((row) => {
+          advancePaymentsMap[row.booking_id] = parseFloat(row.advance_payment);
+        });
+        console.log('advancePaymentsMap', advancePaymentsResult);
+        // 3. Process rows
+        const today = new Date();
+        const rows = bookingResult.rows.map((row) => {
+          const checkInDate = new Date(row.checkInTime);
           const diffTime = today - checkInDate;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
           const totalRent = diffDays * row.daily_rent;
           const advance1 = parseFloat(row.init_advance_payment || 0);
-          const advance2 = parseFloat(row.advance_payment || 0);
+          const advance2 = advancePaymentsMap[row.id] || 0;
 
           const payment = totalRent - advance1 - advance2;
 
@@ -126,48 +139,144 @@ export default defineEventHandler(async (event) => {
             payment
           };
         });
+
         return { rows };
       }
 
       if (type === 'cashBook') {
+        let bookingResult = null;
         if (status === 'Available') {
-          const { rows } = await db.sql`
-            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
-            FROM bookings 
-            JOIN rooms ON bookings.room = rooms.id 
-            WHERE DATE(bookings.checkOutTime) >= ${fromDate} 
-              AND DATE(bookings.checkOutTime) <= ${toDate}
-              AND rooms.roomStatus = 'Available'
-              AND bookings.checkOutTime IS NOT NULL
-            ORDER BY rooms.roomNumber ASC
+          bookingResult = await db.sql`
+            SELECT 
+                b.id,
+                b.patientName,
+                b.guestName,
+                b.mobile,
+                b.patientType,
+                b.checkInTime,
+                b.checkOutTime,
+                b.booking_receipt_number,
+                r.roomNumber,
+                rc.name AS roomCategory,
+                CASE 
+                  WHEN b.patientType = 'cancer' THEN rc.patientRent
+                  ELSE rc.normalRent
+                END AS daily_rent,
+                b.payment AS init_advance_payment,
+                CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
+              FROM bookings b
+              JOIN rooms r ON b.room = r.id
+              JOIN room_category rc ON r.roomCategory = rc.id
+            WHERE DATE(b.checkOutTime) >= ${fromDate} 
+              AND DATE(b.checkOutTime) <= ${toDate}
+              AND r.roomStatus = 'Available'
+              AND b.checkOutTime IS NOT NULL
+            ORDER BY r.roomNumber ASC
           `;
-          return { rows };
         } else if (status === 'Unavailable') {
-          const { rows } = await db.sql`
-            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
-            FROM bookings 
-            JOIN rooms ON bookings.room = rooms.id 
-            WHERE DATE(bookings.checkInTime) >= ${fromDate} 
-              AND DATE(bookings.checkInTime) <= ${toDate}
-              AND rooms.roomStatus = 'Unavailable'
-              AND bookings.checkOutTime IS NULL
-            ORDER BY rooms.roomNumber ASC
+          bookingResult = await db.sql`
+            SELECT 
+                b.id,
+                b.patientName,
+                b.guestName,
+                b.mobile,
+                b.patientType,
+                b.checkInTime,
+                b.checkOutTime,
+                b.booking_receipt_number,
+                r.roomNumber,
+                rc.name AS roomCategory,
+                CASE 
+                  WHEN b.patientType = 'cancer' THEN rc.patientRent
+                  ELSE rc.normalRent
+                END AS daily_rent,
+                b.payment AS init_advance_payment,
+                CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
+              FROM bookings b
+              JOIN rooms r ON b.room = r.id
+              JOIN room_category rc ON r.roomCategory = rc.id
+            WHERE DATE(b.checkInTime) >= ${fromDate} 
+              AND DATE(b.checkInTime) <= ${toDate}
+              AND r.roomStatus = 'Unavailable'
+              AND b.checkOutTime IS NOT NULL
+            ORDER BY r.roomNumber ASC
           `;
-          return { rows };
         } else {
-          const { rows } = await db.sql`
-            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
-            FROM bookings 
-            JOIN rooms ON bookings.room = rooms.id 
+          bookingResult = await db.sql`
+            SELECT 
+                b.id,
+                b.patientName,
+                b.guestName,
+                b.mobile,
+                b.patientType,
+                b.checkInTime,
+                b.checkOutTime,
+                b.booking_receipt_number,
+                r.roomNumber,
+                rc.name AS roomCategory,
+                CASE 
+                  WHEN b.patientType = 'cancer' THEN rc.patientRent
+                  ELSE rc.normalRent
+                END AS daily_rent,
+                b.payment AS init_advance_payment,
+                CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
+              FROM bookings b
+              JOIN rooms r ON b.room = r.id
+              JOIN room_category rc ON r.roomCategory = rc.id
             WHERE (
-                  (DATE(bookings.checkInTime) >= ${fromDate} AND DATE(bookings.checkInTime) <= ${toDate})
+                  (DATE(b.checkInTime) >= ${fromDate} AND DATE(b.checkInTime) <= ${toDate})
                   OR 
-                  (DATE(bookings.checkOutTime) >= ${fromDate} AND DATE(bookings.checkOutTime) <= ${toDate})
+                  (DATE(b.checkOutTime) >= ${fromDate} AND DATE(b.checkOutTime) <= ${toDate})
               )
-            ORDER BY rooms.roomNumber ASC
+            ORDER BY r.roomNumber ASC
           `;
-          return { rows };
         }
+
+        const advancePaymentsResult = await db.sql`
+              SELECT 
+                booking_id,
+                COALESCE(SUM(advance_amount), 0) AS advance_payment
+              FROM booking_payments
+              GROUP BY booking_id
+            `;
+
+        // Convert advance payments into a lookup map
+        const advancePaymentsMap = {};
+        advancePaymentsResult.rows.forEach((row) => {
+          advancePaymentsMap[row.booking_id] = parseFloat(row.advance_payment);
+        });
+        // console.log('advancePaymentsMap', advancePaymentsResult);
+        // 3. Process rows
+        const today = new Date();
+        const rows = bookingResult.rows.map((row) => {
+          const checkInDate = new Date(row.checkInTime);
+          const diffTime = today - checkInDate;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          const totalRent = diffDays * row.daily_rent;
+          const advance1 = parseFloat(row.init_advance_payment || 0);
+          const advance2 = advancePaymentsMap[row.id] || 0;
+
+          const payment = totalRent - advance1 - advance2;
+
+          return {
+            id: row.id,
+            patientName: row.patientName,
+            address: row.address,
+            booking_receipt_number: row.booking_receipt_number,
+            daily_rent: row.daily_rent,
+            mobile: row.mobile,
+            guestName: row.guestName,
+            checkInTime: row.checkInTime,
+            checkOutTime: row.checkOutTime,
+            roomNumber: row.roomNumber,
+            totalDays: diffDays,
+            totalRent,
+            totalAdvance: advance1 + advance2,
+            payment
+          };
+        });
+        return { rows };
       }
       // 5. Default - return all bookings
       const { rows } = await db.sql`

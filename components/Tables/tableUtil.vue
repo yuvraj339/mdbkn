@@ -134,6 +134,17 @@ function exportToPDF() {
       record.roomNumber,
       record.payment // treated as Due Amount here
     ]);
+  } else if (type === 'cashBook') {
+    pdfHeaders = [['Room Number', 'Guest Name', 'Check In', 'Check Out', 'Address', 'Receipt No.', 'Amount']];
+    data = records.value.map((record) => [
+      record.roomNumber,
+      record.guestName,
+      formatDate(record.checkInTime),
+      formatDate(record.checkOutTime),
+      record.address,
+      record.booking_receipt_number,
+      record.payment
+    ]);
   } else {
     pdfHeaders = [['Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Number', 'Payment']];
     data = records.value.map((record) => [
@@ -196,7 +207,8 @@ function print() {
           body { font-family: Arial, sans-serif; padding: 10px; font-size: 10px; }
           table { width: 100%; border-collapse: collapse; margin-top: 20px; }
           th, td { border: 1px solid #ccc; padding: 4px; text-align: left; }
-          th { background-color: #f0f0f0; }
+          th { background-color: #f0f0f0; font-size: 12px; }
+          td { font-size: 12px; }
         </style>
       </head>
       <body>
@@ -208,10 +220,9 @@ function print() {
               <th>S/N</th>
               <th>Room</th>
               <th>Guest Name</th>
-              <th>Mobile</th>
               <th>Check In</th>
-              <th>Patient Name</th>
-              ${type != 'dueBalance' ? '<th>Ward No</th>' : '<th>Pending Amount</th>'}
+              ${type == 'cashBook' ? '<th>Check Out</th><th>Address</th><th>Receipt No.</th>' : '<th>Mobile</th><th>Patient Name</th>'}
+              ${type != 'dueBalance' && type != 'cashBook' ? '<th>Ward No</th>' : '<th>Amount</th>'}
             </tr>
           </thead>
           <tbody>
@@ -222,10 +233,13 @@ function print() {
                 <td>${i++}</td>
                 <td>${record.roomNumber}</td>
                 <td>${record.guestName}</td>
-                <td>${record.mobile}</td>
                 <td>${formatDate(record.checkInTime)}</td>
-                <td>${record.patientName}</td>
-                ${type != 'dueBalance' ? `<td>${record.wardNo}</td>` : `<td>${record.payment}</td>`}
+                ${
+                  type == 'cashBook'
+                    ? `<td>${formatDate(record.checkOutTime)}</td><td>${record.address}</td><td>${record.booking_receipt_number}</td>`
+                    : `<td>${record.mobile}</td><td>${record.patientName}</td>`
+                }
+                ${type != 'dueBalance' && type != 'cashBook' ? `<td>${record.wardNo}</td>` : `<td>${record.payment}</td>`}
 
               </tr>
             `
@@ -239,9 +253,9 @@ function print() {
 
   printWindow.document.write(tableHTML);
   printWindow.document.close();
-  printWindow.focus();
-  // printWindow.print();
-  // printWindow.close();
+  // printWindow.focus();
+  printWindow.print();
+  printWindow.close();
 }
 // Helper function to format date strings
 function formatDate(dateString) {
