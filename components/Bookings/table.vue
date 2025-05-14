@@ -46,8 +46,7 @@ function updateHeader() {
     { key: 'patientName', label: 'Patient Name' },
     { key: 'checkInTime', label: 'Check In' },
     { key: 'mobile', label: 'Mobile' },
-    { key: 'roomNumber', label: 'Room Number' },
-    { key: 'payment', label: 'Payment' }
+    { key: 'roomNumber', label: 'Room Number' }
   ];
 
   let queryString = props.api_url.split('?');
@@ -58,7 +57,9 @@ function updateHeader() {
     type = params.get('type') || type;
   }
 
-  if (type !== 'dueBalance') {
+  if (type == 'dueBalance') {
+    headers.value.push({ key: 'totalDays', label: 'Days' }, { key: 'totalRent', label: 'Rent' }, { key: 'totalAdvance', label: 'Paid' }, { key: 'payment', label: 'Due Amount' });
+  } else {
     headers.value.push(
       { key: 'city', label: 'City' },
       { key: 'roomStatus', label: 'Room Status' },

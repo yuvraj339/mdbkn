@@ -29,6 +29,22 @@ export default defineEventHandler(async (event) => {
 
   await db.sql`DROP TABLE IF EXISTS records`;
 
+  await db.sql`DROP TABLE IF EXISTS booking_payments`;
+
+  // Create table
+  await db.sql`
+    CREATE TABLE IF NOT EXISTS booking_payments (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      room_number INTEGER,
+      date TEXT,
+      advance_amount INTEGER,
+      receipt_no TEXT,
+      booking_id INTEGER,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+
   await db.sql`DROP TABLE IF EXISTS bookings`;
   //   // Create table if it doesn't exist
   await db.sql`CREATE TABLE IF NOT EXISTS bookings (
@@ -60,6 +76,7 @@ export default defineEventHandler(async (event) => {
       doctorName TEXT,
       remark TEXT,
       amenities TEXT,
+      booking_receipt_number TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (room) REFERENCES rooms(id)
     );`;

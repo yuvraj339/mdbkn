@@ -115,22 +115,40 @@ const pdfContent = ref(null);
 
 function exportToPDF() {
   const doc = new jsPDF();
-
+  let type = 'currentBookings'; // Default
+  let queryString = props.apiURL.split('?');
+  if (queryString.length > 1) {
+    const params = new URLSearchParams(queryString[1]);
+    type = params.get('type') || type;
+  }
   // Bookings Table
-  const data = records.value.map((record) => [
-    record.guestName,
-    record.patientName,
-    formatDate(record.checkInTime),
-    formatDate(record.checkOutTime),
-    record.mobile,
-    record.city,
-    // record.roomStatus,
-    record.roomNumber,
-    record.payment
-  ]);
-
+  let pdfHeaders = [];
+  let data = [];
+  if (type === 'dueBalance') {
+    pdfHeaders = [['Guest Name', 'Patient Name', 'Check In', 'Mobile', 'Room Number', 'Due Amount']];
+    data = records.value.map((record) => [
+      record.guestName,
+      record.patientName,
+      formatDate(record.checkInTime),
+      record.mobile,
+      record.roomNumber,
+      record.payment // treated as Due Amount here
+    ]);
+  } else {
+    pdfHeaders = [['Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Number', 'Payment']];
+    data = records.value.map((record) => [
+      record.guestName,
+      record.patientName,
+      formatDate(record.checkInTime),
+      formatDate(record.checkOutTime),
+      record.mobile,
+      record.city,
+      record.roomNumber,
+      record.payment
+    ]);
+  }
   autoTable(doc, {
-    head: [['Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Number', 'Payment']],
+    head: pdfHeaders,
     body: data,
     styles: {
       fontSize: 7 // adjust font size here

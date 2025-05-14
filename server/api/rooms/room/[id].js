@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
     room_category.patientRent,
     bookings.payment, 
     bookings.id, 
+    bookings.booking_receipt_number, 
     bookings.guestName, 
     bookings.state, 
     bookings.city, 
@@ -17,21 +18,29 @@ export default defineEventHandler(async (event) => {
     bookings.checkInTime, 
     bookings.checkOutTime,
     bookings.patientType
-FROM 
-    rooms 
-JOIN 
-    room_category 
-ON 
-    room_category.id = rooms.roomCategory 
-JOIN 
-    bookings
-ON 
-    bookings.room = rooms.id
-WHERE 
-    rooms.id = ${id} 
-    AND bookings.room = ${id} 
-    AND bookings.checkOutTime IS NULL;`;
-    return rows;
+    FROM 
+        rooms 
+    JOIN 
+        room_category 
+    ON 
+        room_category.id = rooms.roomCategory 
+    JOIN 
+        bookings
+    ON 
+        bookings.room = rooms.id
+    WHERE 
+        rooms.id = ${id} 
+        AND bookings.room = ${id} 
+        AND bookings.checkOutTime IS NULL;`;
+
+    let booking_payments = null;
+    if (rows.length >= 1) {
+      booking_payments = await db.sql`SELECT COALESCE(SUM(bp.advance_amount), 0) AS advance_payment from booking_payments bp where bp.booking_id = ${rows[0].id};`;
+    }
+    if (booking_payments.rows.length >= 0) {
+      return { rows: rows[0], advance_paid: booking_payments.rows[0].advance_payment };
+    }
+    return { rows, advance_paid: booking_payments };
     // on bookings.category == rooms.roomCategory // removed because he changing room category
   }
   // jagdish, 114 madanlal

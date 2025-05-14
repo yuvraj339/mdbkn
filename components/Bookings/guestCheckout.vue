@@ -13,6 +13,8 @@ const payment = ref('0');
 let totalDays = ref(0);
 let totalAmount = ref(0);
 let amenities = ref(0);
+let booking_receipt_number = ref(null);
+let advance_paid = ref(0);
 
 // = computed(() => {
 //   if (!guestDetails.value || !checkoutDate.value) return 0;
@@ -23,9 +25,9 @@ let amenities = ref(0);
 
 const remainingPayment = computed(() => {
   if (!roomDetails.value) return 0;
-  const advancePayment = roomDetails.value[0].payment;
+  const advancePayment = roomDetails.value.payment;
   totalAmount.value = amenities.value + totalDays.value * roomPrice.value;
-  const rmp = totalAmount.value - advancePayment;
+  const rmp = totalAmount.value - (parseFloat(advancePayment) + advance_paid.value);
   payment.value = rmp;
   return rmp;
 });
@@ -40,28 +42,10 @@ const fetchRoomDetails = async () => {
 
   // Replace with actual API calls to get room and guest details
   const roomResponse = await $fetch(`/api/rooms/room/${selectedRoom.value}`);
-  roomDetails.value = roomResponse || {};
-  roomPrice.value = roomDetails.value[0].patientType === 'cancer' ? roomDetails.value[0].patientRent : roomDetails.value[0].normalRent;
-  // const guestResponse = await $fetch(`/api/bookings/booking/${selectedRoom.value}`);
-  // guestDetails.value = guestResponse || {};
+  roomDetails.value = roomResponse.rows || {};
+  advance_paid.value = roomResponse.advance_paid || 0;
+  roomPrice.value = roomDetails.value.patientType === 'cancer' ? roomDetails.value.patientRent : roomDetails.value.normalRent;
 };
-
-// // Calculate stay details on checkout date change
-// const calculateStayDetails = (checkinDate) => {
-//   if (checkinDate && checkoutDate) {
-//     // Convert to Date objects
-//     const checkin = new Date(checkinDate);
-//     const checkout = new Date(checkoutDate.value);
-
-//     // Set time to 00:00:00 for both dates
-//     checkin.setHours(0, 0, 0, 0);
-//     checkout.setHours(0, 0, 0, 0);
-
-//     // Calculate difference in days
-//     const differenceInTime = checkout - checkin;
-//     totalDays.value = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
-//   }
-// };
 
 // Calculate stay details on checkout date change
 const calculateStayDetails = (checkinDate) => {
@@ -106,7 +90,8 @@ const checkoutRoom = async () => {
       remark: description.value,
       payment: payment.value,
       room: selectedRoom.value,
-      amenities: amenities.value
+      amenities: amenities.value,
+      booking_receipt_number: booking_receipt_number.value
     }
   });
 
@@ -117,6 +102,7 @@ const checkoutRoom = async () => {
   remainingPayment.value = 0;
   totalAmount.value = 0;
   amenities.value = 0;
+  booking_receipt_number.value = null;
   roomDetails.value = null;
   payment.value = 0;
   description.value = '';
@@ -138,17 +124,17 @@ const checkoutRoom = async () => {
     </div>
 
     <!-- Room Details -->
-    <div class="mb-4 grid grid-cols-2 gap-5 p-7 border border-dashed" v-if="roomDetails && roomDetails[0]">
+    <div class="mb-4 grid grid-cols-2 gap-5 p-7 border border-dashed" v-if="roomDetails && roomDetails">
       <div>
         <h3 class="font-semibold">Room Details:</h3>
         <p
-          >Room Category: <strong class="text-gray-700">{{ roomDetails[0].name }}</strong></p
+          >Room Category: <strong class="text-gray-700">{{ roomDetails.name }}</strong></p
         >
         <p
-          >Room Normal Price: <strong class="text-gray-700">{{ roomDetails[0].normalRent }}</strong> per night</p
+          >Room Normal Price: <strong class="text-gray-700">{{ roomDetails.normalRent }}</strong> per night</p
         >
         <p
-          >Room Patient Price: <strong class="text-gray-700">{{ roomDetails[0].patientRent }}</strong> per night</p
+          >Room Patient Price: <strong class="text-gray-700">{{ roomDetails.patientRent }}</strong> per night</p
         >
       </div>
 
@@ -156,19 +142,22 @@ const checkoutRoom = async () => {
       <div>
         <h3 class="font-semibold">Guest Details:</h3>
         <p
-          >Guest Name: <strong class="text-gray-700">{{ roomDetails[0].guestName }}</strong></p
+          >Guest Name: <strong class="text-gray-700">{{ roomDetails.guestName }}</strong></p
         >
         <p
-          >Check-in Date: <strong class="text-gray-700">{{ roomDetails[0].checkInTime }}</strong></p
+          >Check-in Date: <strong class="text-gray-700">{{ roomDetails.checkInTime }}</strong></p
         >
         <p
-          >Advance Payment: <strong class="text-gray-700">{{ roomDetails[0].payment }}</strong></p
+          >Advance Payment: <strong class="text-gray-700">{{ roomDetails.payment }}</strong></p
         >
         <p
           >Total Days: <strong class="text-gray-700">{{ totalDays }}</strong></p
         >
         <p
           >Total Payment: <strong class="text-gray-700">{{ totalAmount }}</strong></p
+        >
+        <p
+          >Advance Paid: <strong class="text-gray-700">{{ advance_paid }}</strong></p
         >
         <p
           ><span v-if="remainingPayment < 0"> Refund Amount </span>
@@ -179,33 +168,37 @@ const checkoutRoom = async () => {
     </div>
 
     <!-- Checkout Date -->
-    <div class="grid grid-cols-2 gap-5" v-if="roomDetails && roomDetails[0]">
+    <div class="grid grid-cols-2 gap-5" v-if="roomDetails && roomDetails">
       <div class="mb-4">
         <label class="block font-medium mb-1">Select Checkout Date:</label>
-        <input type="datetime-local" v-model="checkoutDate" @change="calculateStayDetails(roomDetails[0].checkInTime)" class="w-full p-2 border rounded" />
+        <input type="datetime-local" v-model="checkoutDate" @change="calculateStayDetails(roomDetails.checkInTime)" class="w-full p-2 border rounded" />
       </div>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-2">Select room Type</label>
         <div class="flex items-center space-x-4">
           <label class="flex items-center">
-            <input type="radio" v-model="roomPrice" :value="roomDetails[0].normalRent" class="mr-2" />
+            <input type="radio" v-model="roomPrice" :value="roomDetails.normalRent" class="mr-2" />
             Normal Price
           </label>
           <label class="flex items-center">
-            <input type="radio" v-model="roomPrice" :value="roomDetails[0].patientRent" class="mr-2" />
+            <input type="radio" v-model="roomPrice" :value="roomDetails.patientRent" class="mr-2" />
             Cancer Patient Price
           </label>
         </div>
       </div>
     </div>
     <!-- Description Box -->
-    <div class="grid grid-cols-2 gap-5">
+    <div class="grid grid-cols-3 gap-5">
       <div class="mb-4">
-        <label class="block font-medium mb-1">Enter amenities amount:</label>
+        <label class="block font-medium mb-1">Amenities amount:</label>
         <input type="number" v-model="amenities" class="w-full p-2 border rounded" />
       </div>
       <div class="mb-4">
-        <label class="block font-medium mb-1">Enter final payment amount:</label>
+        <label class="block font-medium mb-1">Receipt no:</label>
+        <input type="number" v-model="booking_receipt_number" class="w-full p-2 border rounded" />
+      </div>
+      <div class="mb-4">
+        <label class="block font-medium mb-1">Final payment amount:</label>
         <input type="number" v-model="payment" class="w-full p-2 border rounded" />
       </div>
       <!-- <div class="mb-4">

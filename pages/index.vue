@@ -40,7 +40,7 @@ async function showData(relatedTo) {
 
   if(selectedCard.value == 'roomBooked') {
       apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&type=' + selectedCard.value
-  }  else if(selectedCard.value == 'currentBookings' || selectedCard.value == 'dueBalance') {
+  }  else if(selectedCard.value == 'currentBookings' || selectedCard.value == 'dueBalance' || selectedCard.value == 'caseBook') {
       apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&status=' + roomStatus.value + '&type=' + selectedCard.value
   }  else {
       apiUrl.value = '/api/bookings/booking'
@@ -86,14 +86,14 @@ function setFilter() {
         </div>
       </div>
     </div>
-    <div class="grid grid-cols-4 gap-6">
+    <div class="grid grid-cols-5 gap-6">
       <div class="bg-yellow-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('currentBookings')">
         <h3 class="text-2xl font-bold">{{ dashboardData.currentBookings }}</h3>
         <p>Bookings</p>
       </div>
       <div class="bg-blue-300 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('roomDatabase')">
         <h3 class="text-2xl font-bold">{{ dashboardData.roomDatabase }}</h3>
-        <p>Room Database</p>
+        <p>Rooms</p>
       </div>
       <!-- <div class="bg-gray-500 text-white p-6 rounded shadow cursor-pointer" @click="showData('todayBookings')">
         <h3 class="text-2xl font-bold">{{ dashboardData.todayBookings }}</h3>
@@ -101,13 +101,13 @@ function setFilter() {
       </div> -->
       <div class="bg-teal-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('roomBooked')">
         <h3 class="text-2xl font-bold">{{ dashboardData.roomBooked }}</h3>
-        <p>Room Booked</p>
+        <p>Booked Rooms</p>
       </div>
-      <!-- <div class="bg-green-400 text-white p-6 rounded shadow cursor-pointer" @click="showData('todayCheckouts')">
+      <div class="bg-orange-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('caseBook')">
         <h3 class="text-2xl font-bold">{{ dashboardData.todayCheckouts }}</h3>
-        <p>Checkouts</p>
-      </div> -->
-      <div class="bg-pink-500 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('dueBalance')">
+        <p>Cash Book</p>
+      </div>
+      <div class="bg-green-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('dueBalance')">
         <h3 class="text-2xl font-bold">₹{{ dashboardData.dueBalance.dueAmount }}</h3>
         <p>Due Balance</p>
         <!-- <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">

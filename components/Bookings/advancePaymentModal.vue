@@ -81,6 +81,7 @@
               <tr>
                 <th class="border px-2 py-1 text-left">Party Name</th>
                 <th class="border px-2 py-1 text-left">Date</th>
+                <th class="border px-2 py-1 text-left">Receipt No</th>
                 <th class="border px-2 py-1 text-right">Amount</th>
               </tr>
             </thead>
@@ -88,15 +89,17 @@
               <tr v-if="roomDetails && roomDetails.length > 0">
                 <td class="border px-2 py-1">{{ form.name }}</td>
                 <td class="border px-2 py-1">{{ formatDate(roomDetails[0].checkInTime) }}</td>
+                <td class="border px-2 py-1">{{ roomDetails[0].booking_receipt_number || '-' }}</td>
                 <td class="border px-2 py-1 text-right">{{ parseFloat(roomDetails[0].payment).toFixed(2) }}</td>
               </tr>
               <tr v-for="(entry, index) in previousPayments" :key="index">
                 <td class="border px-2 py-1">{{ form.name }}</td>
                 <td class="border px-2 py-1">{{ formatDate(entry.date) }}</td>
+                <td class="border px-2 py-1">{{ entry.receipt_no }}</td>
                 <td class="border px-2 py-1 text-right">{{ entry.advance_amount.toFixed(2) }}</td>
               </tr>
               <tr class="font-bold border-t">
-                <td class="px-4 py-2" colspan="2">Total</td>
+                <td class="px-4 py-2" colspan="3">Total</td>
                 <!-- <td class="px-4 py-2" colspan="2">&nbsp;</td> -->
                 <td class="px-4 py-2 text-right"> {{ totalAmount }}</td>
               </tr>
@@ -155,16 +158,28 @@ function print() {
             <tr>
               <th>Party Name</th>
               <th>Payment Date</th>
+              <th>Receipt No</th>
               <th>Amount</th>
             </tr>
           </thead>
           <tbody>
+            ${
+              roomDetails.value && roomDetails.value.length > 0
+                ? `<tr>
+              <td>${form.name}</td>
+              <td>${formatDate(roomDetails.value[0].checkInTime)}</td>
+              <td>${roomDetails.value[0].booking_receipt_number || '-'}</td>
+              <td>${parseFloat(roomDetails.value[0].payment).toFixed(2)}</td>
+            </tr>`
+                : ''
+            }
             ${previousPayments.value
               .map(
                 (record) => `
               <tr>
                 <td>${form.name}</td>
                 <td>${formatDate(record.date)}</td>
+                <td>${record.receipt_no}</td>
                 <td>${record.advance_amount.toFixed(2)}</td>
               </tr>
             `
@@ -172,6 +187,9 @@ function print() {
               .join('')}
           </tbody>
         </table>
+        <div style="margin-top: 100px;">
+          <strong>Signature</strong> -----------------------------
+        </div>
       </body>
     </html>
   `;
@@ -179,8 +197,8 @@ function print() {
   printWindow.document.write(tableHTML);
   printWindow.document.close();
   printWindow.focus();
-  // printWindow.print();
-  // printWindow.close();
+  printWindow.print();
+  printWindow.close();
 }
 
 function formatDate(dateString) {

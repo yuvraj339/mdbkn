@@ -71,30 +71,103 @@ export default defineEventHandler(async (event) => {
 
       // 4. due Balance
       if (type === 'dueBalance') {
-        const { rows } = await db.sql`
+        const dueBalanceResult = await db.sql`
                       SELECT 
-                        b.id,
-                        b.patientName,
-                        b.guestName,
-                        b.patientType,
-                        b.checkInTime,
-                        b.checkOutTime,
-                        r.roomNumber,
-                        rc.name AS roomCategory,
-                        CASE 
-                          WHEN b.patientType = 'cancer' THEN rc.patientRent
-                          ELSE rc.normalRent
-                        END AS daily_rent,
-                        bp.advance_amount as advance_payment,
-                        b.payment AS init_advance_payment
-                      FROM bookings b
-                      JOIN rooms r ON b.room = r.id
-                      JOIN room_category rc ON r.roomCategory = rc.id
-                      LEFT JOIN booking_payments bp 
-                        ON b.id = bp.booking_id
-                      WHERE b.checkOutTime IS NULL;
-        `;
+                          b.id,
+                          b.patientName,
+                          b.guestName,
+                          b.mobile,
+                          b.patientType,
+                          b.checkInTime,
+                          b.checkOutTime,
+                          r.roomNumber,
+                          rc.name AS roomCategory,
+                          CASE 
+                            WHEN b.patientType = 'cancer' THEN rc.patientRent
+                            ELSE rc.normalRent
+                          END AS daily_rent,
+                          COALESCE(SUM(bp.advance_amount), 0) AS advance_payment,
+                          b.payment AS init_advance_payment
+                        FROM bookings b
+                        JOIN rooms r ON b.room = r.id
+                        JOIN room_category rc ON r.roomCategory = rc.id
+                        LEFT JOIN booking_payments bp ON b.id = bp.booking_id
+                        WHERE b.checkOutTime IS NULL
+                        GROUP BY 
+                          b.id, b.patientName, b.guestName, b.mobile, b.patientType, 
+                          b.checkInTime, b.checkOutTime, r.roomNumber, rc.name, rc.patientRent, 
+                          rc.normalRent, b.payment;
+           `;
+        const today = new Date();
+        const rows = dueBalanceResult.rows.map((row) => {
+          const checkInDate = new Date(row.checkInTime);
+
+          // Calculate days between check-in and today (inclusive of current day)
+          const diffTime = today - checkInDate;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+          const totalRent = diffDays * row.daily_rent;
+          const advance1 = parseFloat(row.init_advance_payment || 0);
+          const advance2 = parseFloat(row.advance_payment || 0);
+
+          const payment = totalRent - advance1 - advance2;
+
+          return {
+            id: row.id,
+            patientName: row.patientName,
+            daily_rent: row.daily_rent,
+            mobile: row.mobile,
+            guestName: row.guestName,
+            checkInTime: row.checkInTime,
+            roomNumber: row.roomNumber,
+            totalDays: diffDays,
+            totalRent,
+            totalAdvance: advance1 + advance2,
+            payment
+          };
+        });
         return { rows };
+      }
+
+      if (type === 'caseBook') {
+        if (status === 'Available') {
+          const { rows } = await db.sql`
+            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+            FROM bookings 
+            JOIN rooms ON bookings.room = rooms.id 
+            WHERE DATE(bookings.checkOutTime) >= ${fromDate} 
+              AND DATE(bookings.checkOutTime) <= ${toDate}
+              AND rooms.roomStatus = 'Available'
+              AND bookings.checkOutTime IS NOT NULL
+            ORDER BY rooms.roomNumber ASC
+          `;
+          return { rows };
+        } else if (status === 'Unavailable') {
+          const { rows } = await db.sql`
+            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+            FROM bookings 
+            JOIN rooms ON bookings.room = rooms.id 
+            WHERE DATE(bookings.checkInTime) >= ${fromDate} 
+              AND DATE(bookings.checkInTime) <= ${toDate}
+              AND rooms.roomStatus = 'Unavailable'
+              AND bookings.checkOutTime IS NULL
+            ORDER BY rooms.roomNumber ASC
+          `;
+          return { rows };
+        } else {
+          const { rows } = await db.sql`
+            SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
+            FROM bookings 
+            JOIN rooms ON bookings.room = rooms.id 
+            WHERE (
+                  (DATE(bookings.checkInTime) >= ${fromDate} AND DATE(bookings.checkInTime) <= ${toDate})
+                  OR 
+                  (DATE(bookings.checkOutTime) >= ${fromDate} AND DATE(bookings.checkOutTime) <= ${toDate})
+              )
+            ORDER BY rooms.roomNumber ASC
+          `;
+          return { rows };
+        }
       }
       // 5. Default - return all bookings
       const { rows } = await db.sql`
