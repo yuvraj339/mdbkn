@@ -40,7 +40,7 @@ async function showData(relatedTo) {
 
   if(selectedCard.value == 'roomBooked') {
       apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&type=' + selectedCard.value
-  }  else if(selectedCard.value == 'currentBookings' || selectedCard.value == 'dueBalance' || selectedCard.value == 'caseBook') {
+  }  else if(selectedCard.value == 'currentBookings' || selectedCard.value == 'dueBalance' || selectedCard.value == 'cashBook') {
       apiUrl.value = '/api/bookings/booking?fromDate=' + fromDate.value + '&toDate=' + toDate.value + '&status=' + roomStatus.value + '&type=' + selectedCard.value
   }  else {
       apiUrl.value = '/api/bookings/booking'
@@ -102,7 +102,7 @@ function setFilter() {
           <h3 class="text-2xl font-bold">{{ dashboardData.roomBooked }}</h3>
           <p>Booked Rooms</p>
         </div>
-        <div class="bg-orange-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('caseBook')">
+        <div class="bg-orange-400 text-white p-6 rounded-2xl shadow-lg cursor-pointer transition-transform hover:scale-105" @click="showData('cashBook')">
           <h3 class="text-2xl font-bold">{{ dashboardData.todayCheckouts }}</h3>
           <p>Cash Book</p>
         </div>

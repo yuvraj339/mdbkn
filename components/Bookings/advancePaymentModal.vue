@@ -86,11 +86,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="roomDetails && roomDetails.length > 0">
+              <tr v-if="roomDetails">
                 <td class="border px-2 py-1">{{ form.name }}</td>
-                <td class="border px-2 py-1">{{ formatDate(roomDetails[0].checkInTime) }}</td>
-                <td class="border px-2 py-1">{{ roomDetails[0].booking_receipt_number || '-' }}</td>
-                <td class="border px-2 py-1 text-right">{{ parseFloat(roomDetails[0].payment).toFixed(2) }}</td>
+                <td class="border px-2 py-1">{{ formatDate(roomDetails.checkInTime) }}</td>
+                <td class="border px-2 py-1">{{ roomDetails.booking_receipt_number || '-' }}</td>
+                <td class="border px-2 py-1 text-right">{{ parseFloat(roomDetails.payment).toFixed(2) }}</td>
               </tr>
               <tr v-for="(entry, index) in previousPayments" :key="index">
                 <td class="border px-2 py-1">{{ form.name }}</td>
@@ -164,12 +164,12 @@ function print() {
           </thead>
           <tbody>
             ${
-              roomDetails.value && roomDetails.value.length > 0
+              roomDetails.value
                 ? `<tr>
               <td>${form.name}</td>
-              <td>${formatDate(roomDetails.value[0].checkInTime)}</td>
-              <td>${roomDetails.value[0].booking_receipt_number || '-'}</td>
-              <td>${parseFloat(roomDetails.value[0].payment).toFixed(2)}</td>
+              <td>${formatDate(roomDetails.value.checkInTime)}</td>
+              <td>${roomDetails.value.booking_receipt_number || '-'}</td>
+              <td>${parseFloat(roomDetails.value.payment).toFixed(2)}</td>
             </tr>`
                 : ''
             }
@@ -251,13 +251,13 @@ const getPatientDetails = async () => {
 
   // Replace with actual API calls to get room and guest details
   const roomResponse = await $fetch(`/api/rooms/room/${form.roomNumber}`);
-  roomDetails.value = roomResponse || {};
-  if (roomDetails.value.length > 0) {
-    form.name = roomDetails.value[0].guestName || '';
-    form.bookingId = roomDetails.value[0].id || null;
-    form.address = roomDetails.value[0].state + ', ' + roomDetails.value[0].city + ', ' + roomDetails.value[0].tehsil + ', ' + roomDetails.value[0].village || '';
-    roomPrice.value = roomDetails.value[0].patientType === 'cancer' ? roomDetails.value[0].patientRent : roomDetails.value[0].normalRent;
-    bookingAdvanceAmount.value = roomDetails.value[0].payment || 0;
+  roomDetails.value = roomResponse.rows || {};
+  if (roomDetails.value.id) {
+    form.name = roomDetails.value.guestName || '';
+    form.bookingId = roomDetails.value.id || null;
+    form.address = roomDetails.value.state + ', ' + roomDetails.value.city + ', ' + roomDetails.value.tehsil + ', ' + roomDetails.value.village || '';
+    roomPrice.value = roomDetails.value.patientType === 'cancer' ? roomDetails.value.patientRent : roomDetails.value.normalRent;
+    bookingAdvanceAmount.value = roomDetails.value.payment || 0;
     listPayments();
   }
 

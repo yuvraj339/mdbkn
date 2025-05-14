@@ -20,15 +20,7 @@ const props = defineProps({
   }
 });
 
-const headers = ref([
-  { key: 'id', label: 'ID' },
-  { key: 'guestName', label: 'Guest Name' },
-  { key: 'patientName', label: 'Patient Name' },
-  { key: 'checkInTime', label: 'Check In' },
-  { key: 'mobile', label: 'Mobile' },
-  { key: 'roomNumber', label: 'Room Number' },
-  { key: 'payment', label: 'Payment' }
-]);
+const headers = ref([]);
 
 watch(
   () => props.api_url,
@@ -45,10 +37,9 @@ function updateHeader() {
     { key: 'guestName', label: 'Guest Name' },
     { key: 'patientName', label: 'Patient Name' },
     { key: 'checkInTime', label: 'Check In' },
-    { key: 'mobile', label: 'Mobile' },
     { key: 'roomNumber', label: 'Room Number' }
   ];
-
+  //  Checkin, checkout, room number, guestName, address, receipt, amount (if checking only advance amount else final amount), date
   let queryString = props.api_url.split('?');
 
   let type = 'currentBookings'; // Default
@@ -56,11 +47,25 @@ function updateHeader() {
     const params = new URLSearchParams(queryString[1]);
     type = params.get('type') || type;
   }
-
+  alert(type);
   if (type == 'dueBalance') {
-    headers.value.push({ key: 'totalDays', label: 'Days' }, { key: 'totalRent', label: 'Rent' }, { key: 'totalAdvance', label: 'Paid' }, { key: 'payment', label: 'Due Amount' });
+    headers.value.push(
+      { key: 'mobile', label: 'Mobile' },
+      { key: 'totalDays', label: 'Days' },
+      { key: 'totalRent', label: 'Rent' },
+      { key: 'totalAdvance', label: 'Paid' },
+      { key: 'payment', label: 'Due Amount' }
+    );
+  } else if (type == 'cashBook') {
+    headers.value.push(
+      { key: 'checkOutTime', label: 'Check Out' },
+      { key: 'booking_receipt_number', label: 'Receipt' },
+      { key: 'address', label: 'Address' },
+      { key: 'payment', label: 'Due Amount' }
+    );
   } else {
     headers.value.push(
+      { key: 'mobile', label: 'Mobile' },
       { key: 'city', label: 'City' },
       { key: 'roomStatus', label: 'Room Status' },
       { key: 'checkOutTime', label: 'Check Out' },

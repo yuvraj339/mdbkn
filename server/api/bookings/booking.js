@@ -129,7 +129,7 @@ export default defineEventHandler(async (event) => {
         return { rows };
       }
 
-      if (type === 'caseBook') {
+      if (type === 'cashBook') {
         if (status === 'Available') {
           const { rows } = await db.sql`
             SELECT bookings.*, rooms.roomNumber, rooms.roomStatus 
