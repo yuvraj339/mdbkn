@@ -19,12 +19,10 @@ export default defineEventHandler(async (event) => {
       );
     `;
     // Add column booking_receipt_number to booking_payments
-    await db.sql`
-      ALTER TABLE bookings
-      ADD COLUMN booking_receipt_number TEXT DEFAULT null;
-    `;
+    await db.sql`ALTER TABLE bookings ADD COLUMN booking_receipt_number TEXT;`;
+    await db.sql`ALTER TABLE bookings ADD COLUMN checkout_payment TEXT;`;
 
-    return { success: true, message: 'Migration completed and Column old_receipt_number added successfully' };
+    return { success: true, message: 'Migration completed and Column old_receipt_number and checkout_payment added successfully' };
   } catch (error) {
     return { success: false, message: error.message };
   }

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 // import { useFetch } from '#app';
 
 const rooms = ref([]);
@@ -33,8 +33,14 @@ const remainingPayment = computed(() => {
 });
 // await $fetch('/api/migrations');
 // Fetch room list (replace with actual API endpoint)
-const { rows } = await $fetch('/api/rooms/room/unavailable');
-rooms.value = rows || [];
+onMounted(async () => {
+  await fetchRoomList();
+  // await fetchRoomDetails();
+});
+async function fetchRoomList() {
+  const { rows } = await $fetch('/api/rooms/room/unavailable');
+  rooms.value = rows || [];
+}
 
 // Fetch room details and guest details based on selected room
 const fetchRoomDetails = async () => {
@@ -72,9 +78,9 @@ const calculateStayDetails = (checkinDate) => {
     }
   }
 };
-import { useRouter } from 'vue-router';
+// import { useRouter } from 'vue-router';
 
-const router = useRouter();
+// const router = useRouter();
 
 const checkoutRoom = async () => {
   if (!selectedRoom.value || !checkoutDate.value) {
@@ -106,7 +112,8 @@ const checkoutRoom = async () => {
   roomDetails.value = null;
   payment.value = 0;
   description.value = '';
-  router.go(0);
+  // router.go(0);
+  fetchRoomList();
 };
 </script>
 
@@ -148,7 +155,7 @@ const checkoutRoom = async () => {
           >Check-in Date: <strong class="text-gray-700">{{ roomDetails.checkInTime }}</strong></p
         >
         <p
-          >Advance Payment: <strong class="text-gray-700">{{ roomDetails.payment }}</strong></p
+          >Initial Paid: <strong class="text-gray-700">{{ roomDetails.payment }}</strong></p
         >
         <p
           >Total Days: <strong class="text-gray-700">{{ totalDays }}</strong></p

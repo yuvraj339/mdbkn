@@ -43,9 +43,11 @@ function updateHeader() {
   let queryString = props.api_url.split('?');
 
   let type = 'currentBookings'; // Default
+  let status = 'both'; // Default
   if (queryString.length > 1) {
     const params = new URLSearchParams(queryString[1]);
     type = params.get('type') || type;
+    status = params.get('status') || status;
   }
   if (type == 'dueBalance') {
     headers.value.push(
@@ -60,8 +62,13 @@ function updateHeader() {
       { key: 'checkOutTime', label: 'Check Out' },
       { key: 'booking_receipt_number', label: 'Receipt' },
       { key: 'address', label: 'Address' },
-      { key: 'payment', label: 'Due Amount' }
+      { key: 'totalAdvance', label: 'Advance' }
     );
+    if (status == 'both' || status == 'Available') {
+      headers.value.push({ key: 'received', label: 'Received' });
+    } else {
+      headers.value = headers.value.filter((header) => header.key !== 'received');
+    }
   } else {
     headers.value.push(
       { key: 'mobile', label: 'Mobile' },

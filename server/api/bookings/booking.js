@@ -156,6 +156,7 @@ export default defineEventHandler(async (event) => {
                 b.checkInTime,
                 b.checkOutTime,
                 b.booking_receipt_number,
+                b.amenities,
                 r.roomNumber,
                 rc.name AS roomCategory,
                 CASE 
@@ -163,6 +164,7 @@ export default defineEventHandler(async (event) => {
                   ELSE rc.normalRent
                 END AS daily_rent,
                 b.payment AS init_advance_payment,
+                b.checkout_payment,
                 CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
               FROM bookings b
               JOIN rooms r ON b.room = r.id
@@ -184,6 +186,7 @@ export default defineEventHandler(async (event) => {
                 b.checkInTime,
                 b.checkOutTime,
                 b.booking_receipt_number,
+                b.amenities,
                 r.roomNumber,
                 rc.name AS roomCategory,
                 CASE 
@@ -191,6 +194,7 @@ export default defineEventHandler(async (event) => {
                   ELSE rc.normalRent
                 END AS daily_rent,
                 b.payment AS init_advance_payment,
+                b.checkout_payment,
                 CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
               FROM bookings b
               JOIN rooms r ON b.room = r.id
@@ -198,7 +202,7 @@ export default defineEventHandler(async (event) => {
             WHERE DATE(b.checkInTime) >= ${fromDate} 
               AND DATE(b.checkInTime) <= ${toDate}
               AND r.roomStatus = 'Unavailable'
-              AND b.checkOutTime IS NOT NULL
+              AND b.checkOutTime IS NULL
             ORDER BY r.roomNumber ASC
           `;
         } else {
@@ -212,6 +216,7 @@ export default defineEventHandler(async (event) => {
                 b.checkInTime,
                 b.checkOutTime,
                 b.booking_receipt_number,
+                b.amenities,
                 r.roomNumber,
                 rc.name AS roomCategory,
                 CASE 
@@ -219,6 +224,7 @@ export default defineEventHandler(async (event) => {
                   ELSE rc.normalRent
                 END AS daily_rent,
                 b.payment AS init_advance_payment,
+                b.checkout_payment,
                 CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
               FROM bookings b
               JOIN rooms r ON b.room = r.id
@@ -247,36 +253,46 @@ export default defineEventHandler(async (event) => {
         });
         // console.log('advancePaymentsMap', advancePaymentsResult);
         // 3. Process rows
+        let allAdvance = 0;
+        let allReceived = 0;
+        let allTotalRent = 0;
         const today = new Date();
         const rows = bookingResult.rows.map((row) => {
           const checkInDate = new Date(row.checkInTime);
           const diffTime = today - checkInDate;
           const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-          const totalRent = diffDays * row.daily_rent;
+          const totalRent = diffDays * row.daily_rent + parseFloat(row.amenities || 0);
           const advance1 = parseFloat(row.init_advance_payment || 0);
           const advance2 = advancePaymentsMap[row.id] || 0;
+          console.log(advance1, advance2);
+          const received = totalRent - (advance1 + advance2);
 
-          const payment = totalRent - advance1 - advance2;
-
+          allAdvance += !row.checkOutTime ? parseFloat(advance1) + parseFloat(advance2) : 0;
+          allReceived += row.checkOutTime ? parseFloat(received) : 0;
+          allTotalRent += parseFloat(totalRent);
           return {
             id: row.id,
             patientName: row.patientName,
             address: row.address,
-            booking_receipt_number: row.booking_receipt_number,
+            booking_receipt_number: parseInt(row.booking_receipt_number),
             daily_rent: row.daily_rent,
             mobile: row.mobile,
             guestName: row.guestName,
             checkInTime: row.checkInTime,
             checkOutTime: row.checkOutTime,
             roomNumber: row.roomNumber,
+            checkoutPayment: parseFloat(row.checkout_payment),
             totalDays: diffDays,
-            totalRent,
-            totalAdvance: advance1 + advance2,
-            payment
+            totalRent: totalRent,
+            totalAdvance: !row.checkOutTime ? advance1 + advance2 : 0,
+            payment: row.init_advance_payment,
+            received: row.checkOutTime ? received : 0,
+            amenities: parseFloat(row.amenities)
           };
         });
-        return { rows };
+
+        return { rows, other: { allAdvance, allReceived, allTotalRent } };
       }
       // 5. Default - return all bookings
       const { rows } = await db.sql`
@@ -295,40 +311,6 @@ export default defineEventHandler(async (event) => {
     }
   }
   if (event.node.req.method === 'POST') {
-    // await db.sql`DROP TABLE IF EXISTS bookings`;
-    // //   // Create table if it doesn't exist
-    // await db.sql`CREATE TABLE IF NOT EXISTS bookings (
-    //   id INTEGER PRIMARY KEY AUTOINCREMENT,
-    //   patientType TEXT,
-    //   bookingType TEXT,
-    //   checkInTime TEXT,
-    //   checkOutTime TEXT,
-    //   category TEXT,
-    //   room INTEGER,
-    //   payment TEXT,
-    //   mobile TEXT,
-    //   guestName TEXT,
-    //   patientGuestRelation TEXT,
-    //   document TEXT,
-    //   gender TEXT,
-    //   caste TEXT,
-    //   age INTEGER,
-    //   state TEXT,
-    //   city TEXT,
-    //   tehsil TEXT,
-    //   village TEXT,
-    //   patientName TEXT,
-    //   hospital TEXT,
-    //   wardNo TEXT,
-    //   guestFName TEXT,
-    //   hospitalRoomNumber TEXT,
-    //   hospitalBedNumber TEXT,
-    //   doctorName TEXT,
-    //   remark TEXT,
-    //   amenities TEXT,
-    //   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    //   FOREIGN KEY (room) REFERENCES rooms(id)
-    // );`;
     const formData = await readMultipartFormData(event);
 
     let uploadPath = '';

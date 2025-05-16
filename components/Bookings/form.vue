@@ -221,6 +221,10 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 const bookingStore = useBookingModalStore();
 onMounted(async () => {
+  roomCategoryDetails();
+});
+
+async function roomCategoryDetails() {
   try {
     const cat_response = await $fetch('/api/rooms/category/all_categories');
     const { rows } = await $fetch('/api/rooms/room/available');
@@ -232,7 +236,7 @@ onMounted(async () => {
     error.value = err.message;
     console.log('Error fetching records:', err);
   }
-});
+}
 const getCategoryRooms = (category) => {
   rooms.value = roomDB.value.filter((room) => room.roomCategory == category);
   // console.log('Rooms:', rooms);
@@ -323,6 +327,7 @@ const save = async () => {
   if (error) {
     alert('Failed to save Booking');
   } else {
+    // roomCategoryDetails();
     alert('Room Booking added successfully!');
     bookingStore.closeModel();
     router.go(0);

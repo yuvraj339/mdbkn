@@ -77,6 +77,7 @@ export default defineEventHandler(async (event) => {
       remark TEXT,
       amenities TEXT,
       booking_receipt_number TEXT,
+      checkout_payment TEXT,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (room) REFERENCES rooms(id)
     );`;

@@ -92,7 +92,7 @@ const props = defineProps({
 });
 
 const apiUrlRef = computed(() => props.apiURL); // make it reactive
-const { records, fetchData, error } = useFetchData(apiUrlRef);
+const { records, fetchData, error, other } = useFetchData(apiUrlRef);
 
 watch(
   () => props.apiURL,
@@ -111,16 +111,29 @@ const editRecord = async (data) => {
 
   // await fetchData('PUT', `/api/rooms/${roomId}`, updatedData);
 };
-const pdfContent = ref(null);
 
-function exportToPDF() {
-  const doc = new jsPDF();
-  let type = 'currentBookings'; // Default
-  let queryString = props.apiURL.split('?');
+const pdfContent = ref(null);
+function getBookingParams() {
+  const queryString = props.apiURL.split('?');
+
+  let type = 'currentBookings'; // Default value
+  let status = 'both'; // Default value
+  let toDate = '';
+  let fromDate = '';
+
   if (queryString.length > 1) {
     const params = new URLSearchParams(queryString[1]);
     type = params.get('type') || type;
+    status = params.get('status') || status;
+    fromDate = params.get('fromDate') || '';
+    toDate = params.get('toDate') || '';
   }
+
+  return { type, status, fromDate, toDate };
+}
+function exportToPDF() {
+  const doc = new jsPDF();
+  const { type, status, fromDate, toDate } = getBookingParams();
   // Bookings Table
   let pdfHeaders = [];
   let data = [];
@@ -135,16 +148,30 @@ function exportToPDF() {
       record.payment // treated as Due Amount here
     ]);
   } else if (type === 'cashBook') {
-    pdfHeaders = [['Room Number', 'Guest Name', 'Check In', 'Check Out', 'Address', 'Receipt No.', 'Amount']];
-    data = records.value.map((record) => [
-      record.roomNumber,
-      record.guestName,
-      formatDate(record.checkInTime),
-      formatDate(record.checkOutTime),
-      record.address,
-      record.booking_receipt_number,
-      record.payment
-    ]);
+    if (status == 'both' || status == 'Available') {
+      pdfHeaders = [['Room Number', 'Guest Name', 'Check In', 'Check Out', 'Address', 'Receipt No.', 'Advance', 'Received']];
+      data = records.value.map((record) => [
+        record.roomNumber,
+        record.guestName,
+        formatDate(record.checkInTime),
+        formatDate(record.checkOutTime),
+        record.address,
+        record.booking_receipt_number,
+        record.totalAdvance,
+        record.received
+      ]);
+    } else {
+      pdfHeaders = [['Room Number', 'Guest Name', 'Check In', 'Check Out', 'Address', 'Receipt No.', 'Advance']];
+      data = records.value.map((record) => [
+        record.roomNumber,
+        record.guestName,
+        formatDate(record.checkInTime),
+        formatDate(record.checkOutTime),
+        record.address,
+        record.booking_receipt_number,
+        record.totalAdvance
+      ]);
+    }
   } else {
     pdfHeaders = [['Guest Name', 'Patient Name', 'Check In', 'Check Out', 'Mobile', 'City', 'Room Number', 'Payment']];
     data = records.value.map((record) => [
@@ -185,35 +212,94 @@ function exportToExcel() {
 }
 
 function print() {
-  let queryString = props.apiURL.split('?');
+  const { type, status, fromDate, toDate } = getBookingParams();
 
-  let type = 'currentBookings'; // Default
-  let toDate = '';
-  let fromDate = '';
-  if (queryString.length > 1) {
-    const params = new URLSearchParams(queryString[1]);
-    type = params.get('type') || type;
-    fromDate = params.get('fromDate') || '';
-    toDate = params.get('toDate') || '';
-  }
+  const printWindow = window.open('', '', 'width=1000,height=700');
+  let i = 1;
 
-  const printWindow = window.open('', '', 'width=800,height=600');
-  let i = 1; // Initialize the counter variable
   const tableHTML = `
     <html>
       <head>
         <title>Print</title>
         <style>
-          body { font-family: Arial, sans-serif; padding: 10px; font-size: 10px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th, td { border: 1px solid #ccc; padding: 4px; text-align: left; }
-          th { background-color: #f0f0f0; font-size: 12px; }
-          td { font-size: 12px; }
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            font-size: 12px;
+          }
+          h2, h4 {
+            margin: 5px 0;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            table-layout: auto;
+          }
+          th, td {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+          }
+          th {
+            background-color: #f8f8f8;
+            font-size: 13px;
+            font-weight: bold;
+          }
+          td {
+            font-size: 12px;
+          }
+          tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+          }
+          .header {
+            border-bottom: 2px solid #444;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+          }
+
+          .header h2 {
+            font-size: 18px;
+            margin: 0 0 8px;
+            color: #333;
+          }
+
+          .print-info {
+            font-size: 13px;
+            margin: 0 0 6px;
+            color: #555;
+          }
+
+          .summary {
+            font-size: 13px;
+            color: #444;
+            display: flex;
+            gap: 30px;
+            margin-top: 4px;
+          }
+          .summary span {
+            font-weight: bold;
+          }
         </style>
       </head>
       <body>
-        <h2>Records ${fromDate != '' && type != 'dueBalance' ? `From ${fromDate} - ${toDate}` : ''}</h2>
-        <h4>Print Date & Time: ${new Date().toISOString().split('T')}</h4>
+        <div class="header">
+          <h2>Records 
+            ${fromDate && type !== 'dueBalance' ? `From ${fromDate} to ${toDate}` : ''}
+          </h2>
+          <p class="print-info">
+            Printed On: <strong>${new Date().toLocaleString()}</strong>
+          </p>
+          ${
+            type === 'cashBook' && other.value != null
+              ? `<div class="summary">
+                  <span><strong>Total Advance:</strong> ${other.value.allAdvance}</span>
+                  <span><strong>Total Received:</strong> ${other.value.allReceived}</span>
+                </div>`
+              : ''
+          }
+        </div>
         <table>
           <thead>
             <tr>
@@ -221,29 +307,39 @@ function print() {
               <th>Room</th>
               <th>Guest Name</th>
               <th>Check In</th>
-              ${type == 'cashBook' ? '<th>Check Out</th><th>Address</th><th>Receipt No.</th>' : '<th>Mobile</th><th>Patient Name</th>'}
-              ${type != 'dueBalance' && type != 'cashBook' ? '<th>Ward No</th>' : '<th>Amount</th>'}
+              ${type === 'cashBook' ? '<th>Check Out</th><th>Address</th><th>Receipt No.</th>' : '<th>Mobile</th><th>Patient Name</th>'}
+              ${
+                type !== 'dueBalance' && type !== 'cashBook'
+                  ? '<th>Ward No</th>'
+                  : status === 'both' || status === 'Available'
+                  ? '<th>Total Advance</th><th>Received</th>'
+                  : '<th>Total Advance</th>'
+              }
             </tr>
           </thead>
           <tbody>
             ${records.value
-              .map(
-                (record) => `
-              <tr>
-                <td>${i++}</td>
-                <td>${record.roomNumber}</td>
-                <td>${record.guestName}</td>
-                <td>${formatDate(record.checkInTime)}</td>
-                ${
-                  type == 'cashBook'
-                    ? `<td>${formatDate(record.checkOutTime)}</td><td>${record.address}</td><td>${record.booking_receipt_number}</td>`
-                    : `<td>${record.mobile}</td><td>${record.patientName}</td>`
-                }
-                ${type != 'dueBalance' && type != 'cashBook' ? `<td>${record.wardNo}</td>` : `<td>${record.payment}</td>`}
+              .map((record) => {
+                const commonCols = `
+                  <td>${i++}</td>
+                  <td>${record.roomNumber}</td>
+                  <td>${record.guestName}</td>
+                  <td>${formatDate(record.checkInTime)}</td>`;
 
-              </tr>
-            `
-              )
+                const conditionalCols =
+                  type === 'cashBook'
+                    ? `<td>${formatDate(record.checkOutTime)}</td><td>${record.address}</td><td>${record.booking_receipt_number}</td>`
+                    : `<td>${record.mobile}</td><td>${record.patientName}</td>`;
+
+                const additionalCols =
+                  type !== 'dueBalance' && type !== 'cashBook'
+                    ? `<td>${record.wardNo}</td>`
+                    : status === 'both' || status === 'Available'
+                    ? `<td>${record.totalAdvance}</td><td>${record.received}</td>`
+                    : `<td>${record.totalAdvance}</td>`;
+
+                return `<tr>${commonCols}${conditionalCols}${additionalCols}</tr>`;
+              })
               .join('')}
           </tbody>
         </table>
@@ -253,9 +349,10 @@ function print() {
 
   printWindow.document.write(tableHTML);
   printWindow.document.close();
-  // printWindow.focus();
-  printWindow.print();
-  printWindow.close();
+  printWindow.focus();
+
+  // printWindow.print();
+  // printWindow.close();
 }
 // Helper function to format date strings
 function formatDate(dateString) {

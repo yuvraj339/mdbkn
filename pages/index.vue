@@ -119,7 +119,9 @@ function setFilter() {
           :class="{ 'scale-110 border-solid border-2 border-gray-700': selectedCard == 'cashBook' }"
           @click="showData('cashBook')"
         >
-          <h3 class="text-2xl font-bold">{{ dashboardData.todayCheckouts }}</h3>
+          <span class="flex"
+            ><h3 class="text-2xl font-bold mr-1">{{ parseInt(dashboardData.todayCheckouts) + parseInt(dashboardData.todayBookings) }}</h3></span
+          >
           <p>Cash Book</p>
         </div>
         <div
