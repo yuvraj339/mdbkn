@@ -56,25 +56,31 @@ const fetchRoomDetails = async () => {
 // Calculate stay details on checkout date change
 const calculateStayDetails = (checkinDate) => {
   if (checkinDate && checkoutDate) {
-    // Convert to Date objects
     const checkin = new Date(checkinDate);
     const checkout = new Date(checkoutDate.value);
 
-    // If the checkout date is the same as the check-in date
-    if (checkin.getFullYear() === checkout.getFullYear() && checkin.getMonth() === checkout.getMonth() && checkin.getDate() === checkout.getDate()) {
+    const sameDay = checkin.getFullYear() === checkout.getFullYear() && checkin.getMonth() === checkout.getMonth() && checkin.getDate() === checkout.getDate();
+
+    if (sameDay) {
+      // Same day check-in and check-out → 1 day stay
       totalDays.value = 1;
     } else {
-      // If checkout date is the next day and time is after 11:00 AM
-      const nextDay = new Date(checkin);
-      nextDay.setDate(nextDay.getDate() + 1);
+      // Set both to midnight to count full days
+      const checkinMidnight = new Date(checkin);
+      checkinMidnight.setHours(0, 0, 0, 0);
 
-      if (nextDay.getFullYear() === checkout.getFullYear() && nextDay.getMonth() === checkout.getMonth() && nextDay.getDate() === checkout.getDate() && checkout.getHours() >= 11) {
-        totalDays.value = 2;
-      } else {
-        // General case for difference in days
-        const differenceInTime = checkout - checkin;
-        totalDays.value = Math.ceil(differenceInTime / (1000 * 60 * 60 * 24));
+      const checkoutMidnight = new Date(checkout);
+      checkoutMidnight.setHours(0, 0, 0, 0);
+
+      let diffDays = Math.floor((checkoutMidnight - checkinMidnight) / (1000 * 60 * 60 * 24));
+
+      // Add one full day if checkout time is 12:00 PM or later
+      if (checkout.getHours() >= 12) {
+        diffDays += 1;
       }
+
+      // Always add 1 because even 1-day stay spans at least 1 night
+      totalDays.value = diffDays;
     }
   }
 };

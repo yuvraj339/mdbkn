@@ -259,10 +259,33 @@ export default defineEventHandler(async (event) => {
         const today = new Date();
         const rows = bookingResult.rows.map((row) => {
           const checkInDate = new Date(row.checkInTime);
-          const diffTime = today - checkInDate;
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          const checkOutDate = row.checkOutTime ? new Date(row.checkOutTime) : null;
 
-          const totalRent = diffDays * row.daily_rent + parseFloat(row.amenities || 0);
+          let effectiveCheckout = checkOutDate || new Date(); // Today if not checked out
+          let totalDays = 1;
+
+          // Check if check-in and check-out are the same date
+          const isSameDay = checkInDate.toDateString() === effectiveCheckout.toDateString();
+
+          if (isSameDay) {
+            totalDays = 1;
+          } else {
+            // Strip time to midnight for diff
+            const checkInMid = new Date(checkInDate);
+            checkInMid.setHours(0, 0, 0, 0);
+
+            const checkoutMid = new Date(effectiveCheckout);
+            checkoutMid.setHours(0, 0, 0, 0);
+
+            totalDays = Math.floor((checkoutMid - checkInMid) / (1000 * 60 * 60 * 24));
+
+            // Add one more day if checkout time is after or at 12 PM
+            if (effectiveCheckout.getHours() >= 12) {
+              totalDays += 1;
+            }
+          }
+
+          const totalRent = totalDays * row.daily_rent + parseFloat(row.amenities || 0);
           const advance1 = parseFloat(row.init_advance_payment || 0);
           const advance2 = advancePaymentsMap[row.id] || 0;
           console.log(advance1, advance2);
@@ -283,7 +306,7 @@ export default defineEventHandler(async (event) => {
             checkOutTime: row.checkOutTime,
             roomNumber: row.roomNumber,
             checkoutPayment: parseFloat(row.checkout_payment),
-            totalDays: diffDays,
+            totalDays: totalDays,
             totalRent: totalRent,
             totalAdvance: !row.checkOutTime ? advance1 + advance2 : 0,
             payment: row.init_advance_payment,
