@@ -5,8 +5,9 @@ const db = useDatabase('mdbkn');
 //   updateRoomStmt.run(status, roomID);
 // }
 export default defineEventHandler(async (event) => {
+  const query = getQuery(event);
+
   if (event.node.req.method === 'GET') {
-    const query = getQuery(event);
     const id = query.bookingId;
     const room_number = query.roomNumber;
 
@@ -32,14 +33,18 @@ export default defineEventHandler(async (event) => {
   // Get the ID from the route parameter
 
   if (event.node.req.method === 'DELETE') {
-    const statement = db.prepare(`DELETE FROM booking_payments WHERE id = ?`);
-    const result = statement.run(id);
-
-    if (result.changes > 0) {
-      return { success: true, message: 'Record deleted successfully' };
-    } else {
-      return { success: false, message: 'Record not found or deletion failed' };
+    const payment_id = query.payment_id;
+    if (!payment_id) {
+      return { success: false, message: 'Payment ID is required' };
     }
+    const statement = db.prepare(`DELETE FROM booking_payments WHERE id = ?`);
+    const result = statement.run(payment_id);
+    console.log('Delete Result:', result);
+    // if (result.changes > 0) {
+    return { success: true, message: 'Record deleted successfully' };
+    // } else {
+    //   return { success: false, message: 'Record not found or deletion failed' };
+    // }
   }
 
   return { success: false, message: 'Invalid request method' };

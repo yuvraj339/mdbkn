@@ -83,6 +83,7 @@
                 <th class="border px-2 py-1 text-left">Date</th>
                 <th class="border px-2 py-1 text-left">Receipt No</th>
                 <th class="border px-2 py-1 text-right">Amount</th>
+                <th class="border px-2 py-1 text-right">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -97,6 +98,7 @@
                 <td class="border px-2 py-1">{{ formatDate(entry.date) }}</td>
                 <td class="border px-2 py-1">{{ entry.receipt_no }}</td>
                 <td class="border px-2 py-1 text-right">{{ entry.advance_amount.toFixed(2) }}</td>
+                <td class="border px-2 py-1 text-right"><button @click="deleteRecord(entry.id)" class="text-red-500">🗑️</button></td>
               </tr>
               <tr class="font-bold border-t">
                 <td class="px-4 py-2" colspan="3">Total</td>
@@ -264,6 +266,19 @@ const getPatientDetails = async () => {
 
   // const guestResponse = await $fetch(`/api/bookings/booking/${selectedRoom.value}`);
   // guestDetails.value = guestResponse || {};
+};
+
+const deleteRecord = async (id) => {
+  const { data, error } = await useFetch(`/api/bookings/advance/payment?payment_id=${id}`, {
+    method: 'DELETE' // Use DELETE method here
+  });
+  // console.log(data._rawValue.message, error)
+  // if (error.value) {
+  //   alert('Failed to delete record: ');
+  // } else {
+  listPayments();
+  alert('Record deleted successfully!');
+  // }
 };
 const submitForm = async () => {
   if (!form.roomNumber) {
