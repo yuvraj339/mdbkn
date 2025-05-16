@@ -351,8 +351,8 @@ function print() {
   printWindow.document.close();
   printWindow.focus();
 
-  // printWindow.print();
-  // printWindow.close();
+  printWindow.print();
+  printWindow.close();
 }
 // Helper function to format date strings
 function formatDate(dateString) {
