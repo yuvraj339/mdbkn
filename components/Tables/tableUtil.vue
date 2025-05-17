@@ -285,8 +285,8 @@ function print() {
       </head>
       <body>
         <div class="header">
-          <h2>Records 
-            ${fromDate && type !== 'dueBalance' ? `From ${fromDate} to ${toDate}` : ''}
+          <h2>${type === 'cashBook' ? 'Cash Book' : 'Records'}
+              ${fromDate && type !== 'dueBalance' ? `From ${fromDate} to ${toDate}` : ''}
           </h2>
           <p class="print-info">
             Printed On: <strong>${new Date().toLocaleString()}</strong>
@@ -295,7 +295,7 @@ function print() {
             type === 'cashBook' && other.value != null
               ? `<div class="summary">
                   <span><strong>Total Advance:</strong> ${other.value.allAdvance}</span>
-                  <span><strong>Total Received:</strong> ${other.value.allReceived}</span>
+                  <span><strong>Payment Received on Checkout:</strong> ${other.value.allReceived}</span>
                 </div>`
               : ''
           }
