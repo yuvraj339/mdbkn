@@ -2,4 +2,6 @@
 
 <template>
   <BookingsGuestCheckout />
+  <BookingsCheckoutTable />
+  <BookingsCheckoutEdit />
 </template>

@@ -70,7 +70,6 @@ const updateProfile = async () => {
       password: form.password
     }
   });
-  // console.log(data.value.message, 'data');
   if (error.value) {
     alert('Update failed, please try again.');
   } else if (!data.value.success) {

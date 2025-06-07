@@ -66,6 +66,8 @@ function updateHeader() {
     );
     if (status == 'both' || status == 'Available') {
       headers.value.push({ key: 'received', label: 'Received' });
+    } else if (status == 'both' || status == 'Available' || status == 'advance') {
+      headers.value.push({ key: 'initAdvance', label: 'Init Adv' });
     } else {
       headers.value = headers.value.filter((header) => header.key !== 'received');
     }

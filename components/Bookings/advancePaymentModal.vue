@@ -220,9 +220,6 @@ const listPayments = async () => {
     method: 'GET',
     params: { roomNumber: form.roomNumber, bookingId: form.bookingId }
   });
-  console.log('Fetching payments for room:', form.roomNumber);
-  console.log('data:', data.value);
-  console.log('error:', error);
 
   if (error.value) {
     console.error('Error fetching payments:', error.value);
@@ -237,7 +234,6 @@ onMounted(async () => {
   try {
     const { rows } = await $fetch('/api/rooms/room/unavailable');
     rooms.value = rows; // Adjust to match the response structure
-    console.log('rooms:', rooms.value);
   } catch (err) {
     error.value = err.message;
     console.log('Error fetching records:', err);

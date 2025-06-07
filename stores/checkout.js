@@ -2,30 +2,11 @@ import { defineStore } from 'pinia';
 // import { ref } from 'vue';
 var records = {
   booking_receipt_number: '',
-  patientType: '',
-  bookingType: '',
   checkInTime: getFormattedDateWithTime(16, 30),
-  category: '',
-  payment: 1000,
-  mobile: '',
+  checkOutTime: getFormattedDateWithTime(16, 30),
+  payment: 0,
   guestName: '',
-  patientGuestRelation: '',
-  document: File,
-  gender: '',
-  caste: '',
-  age: '',
-  state: '',
-  city: '',
-  tehsil: '',
-  village: '',
-  patientName: '',
-  hospital: '',
-  wardNo: '',
-  guestFName: '',
-  hospitalRoomNumber: '',
-  hospitalBedNumber: '',
-  doctorName: '',
-  remark: '',
+  // patientName: '',
   amenities: 0
 };
 function getFormattedDateWithTime(hour, minute) {
@@ -43,7 +24,7 @@ function getFormattedDateWithTime(hour, minute) {
   // console.log(formattedDate);
   return formattedDate;
 }
-export const useBookingModalStore = defineStore('modalBooking', {
+export const useCheckoutModalStore = defineStore('modalCheckout', {
   state: () => ({
     showModal: false,
     editMode: false,

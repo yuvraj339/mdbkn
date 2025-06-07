@@ -124,7 +124,7 @@ const checkoutRoom = async () => {
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto p-4 bg-white shadow rounded">
+  <div class="max-full mx-auto p-4 bg-white shadow rounded">
     <h2 class="text-2xl font-semibold mb-4">Final Checkout</h2>
 
     <!-- Room Number Selector -->
@@ -137,9 +137,9 @@ const checkoutRoom = async () => {
     </div>
 
     <!-- Room Details -->
-    <div class="mb-4 grid grid-cols-2 gap-5 p-7 border border-dashed" v-if="roomDetails && roomDetails">
+    <div class="mb-4 flex justify-between gap-5 p-7 border border-dashed" v-if="roomDetails && roomDetails">
       <div>
-        <h3 class="font-semibold">Room Details:</h3>
+        <h3 class="font-semibold border-b-2">Room Details:</h3>
         <p
           >Room Category: <strong class="text-gray-700">{{ roomDetails.name }}</strong></p
         >
@@ -153,7 +153,7 @@ const checkoutRoom = async () => {
 
       <!-- Guest and Payment Details -->
       <div>
-        <h3 class="font-semibold">Guest Details:</h3>
+        <h3 class="font-semibold border-b-2">Guest Details:</h3>
         <p
           >Guest Name: <strong class="text-gray-700">{{ roomDetails.guestName }}</strong></p
         >
@@ -161,11 +161,15 @@ const checkoutRoom = async () => {
           >Check-in Date: <strong class="text-gray-700">{{ roomDetails.checkInTime }}</strong></p
         >
         <p
-          >Initial Paid: <strong class="text-gray-700">{{ roomDetails.payment }}</strong></p
-        >
-        <p
           >Total Days: <strong class="text-gray-700">{{ totalDays }}</strong></p
         >
+      </div>
+      <div>
+        <h3 class="font-semibold border-b-2">Payment Details:</h3>
+        <p
+          >Initial Paid: <strong class="text-gray-700">{{ roomDetails.payment }}</strong></p
+        >
+
         <p
           >Total Payment: <strong class="text-gray-700">{{ totalAmount }}</strong></p
         >
@@ -181,13 +185,13 @@ const checkoutRoom = async () => {
     </div>
 
     <!-- Checkout Date -->
-    <div class="grid grid-cols-2 gap-5" v-if="roomDetails && roomDetails">
+    <div class="flex justify-between gap-5" v-if="roomDetails && roomDetails">
       <div class="mb-4">
         <label class="block font-medium mb-1">Select Checkout Date:</label>
         <input type="datetime-local" v-model="checkoutDate" @change="calculateStayDetails(roomDetails.checkInTime)" class="w-full p-2 border rounded" />
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">Select room Type</label>
+        <label class="block font-medium mb-1">Select room Type</label>
         <div class="flex items-center space-x-4">
           <label class="flex items-center">
             <input type="radio" v-model="roomPrice" :value="roomDetails.normalRent" class="mr-2" />
@@ -199,9 +203,6 @@ const checkoutRoom = async () => {
           </label>
         </div>
       </div>
-    </div>
-    <!-- Description Box -->
-    <div class="grid grid-cols-3 gap-5">
       <div class="mb-4">
         <label class="block font-medium mb-1">Amenities amount:</label>
         <input type="number" v-model="amenities" class="w-full p-2 border rounded" />
@@ -214,6 +215,9 @@ const checkoutRoom = async () => {
         <label class="block font-medium mb-1">Final payment amount:</label>
         <input type="number" v-model="payment" class="w-full p-2 border rounded" />
       </div>
+    </div>
+    <!-- Description Box -->
+    <div class="grid grid-cols-3 gap-5">
       <!-- <div class="mb-4">
         <label class="block font-medium mb-1">Enter Discount:</label>
         <input type="number" v-model="discount" class="w-full p-2 border rounded" />

@@ -48,8 +48,9 @@
               <td v-if="header.key != 'actions'">{{ record[header.key] }}</td>
               <td v-else>
                 <!-- {{ Array.isArray(header.label) }} -->
-                <button v-if="(header.label = 'edit')" @click="editRecord(record)" class="text-blue-500 mr-2">✏️</button>
-                <button v-if="(header.label = 'delete')" @click="deleteRecord(record.id)" class="text-red-500">🗑️</button>
+
+                <button v-if="header.label.includes('edit')" @click="editRecord(record)" class="text-blue-500 mr-2">✏️</button>
+                <button v-if="header.label.includes('delete')" @click="deleteRecord(record.id)" class="text-red-500">🗑️</button>
               </td>
             </template>
           </tr>

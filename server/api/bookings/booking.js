@@ -205,6 +205,45 @@ export default defineEventHandler(async (event) => {
               AND b.checkOutTime IS NULL
             ORDER BY r.roomNumber ASC
           `;
+        } else if (status === 'advance') {
+          console.log(status, fromDate, toDate, 'data');
+          bookingResult = await db.sql`
+                            SELECT
+                              b.id,
+                              b.patientName,
+                              b.guestName,
+                              b.mobile,
+                              b.patientType,
+                              b.checkInTime,
+                              b.checkOutTime,
+                              b.booking_receipt_number,
+                              b.amenities,
+                              r.roomNumber,
+                              rc.name AS roomCategory,
+                              CASE 
+                                WHEN b.patientType = 'cancer' THEN rc.patientRent
+                                ELSE rc.normalRent
+                              END AS daily_rent,
+                              b.payment AS init_advance_payment,
+                              b.checkout_payment,
+                              CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
+                            FROM bookings b
+                            JOIN rooms r ON b.room = r.id
+                            JOIN room_category rc ON r.roomCategory = rc.id
+                            LEFT JOIN (
+                              SELECT DISTINCT booking_id
+                              FROM booking_payments
+                              WHERE strftime('%Y-%m-%d', date) BETWEEN ${fromDate} AND ${toDate}
+                            ) ap ON ap.booking_id = b.id
+                            WHERE (
+                                DATE(b.checkInTime) BETWEEN ${fromDate} AND ${toDate}
+                                OR ap.booking_id IS NOT NULL
+                              )
+                              AND r.roomStatus = 'Unavailable'
+                              AND b.checkOutTime IS NULL
+                            ORDER BY r.roomNumber ASC
+                          `;
+          // return { rows: bookingResult.rows };
         } else {
           bookingResult = await db.sql`
             SELECT 
@@ -237,14 +276,26 @@ export default defineEventHandler(async (event) => {
             ORDER BY r.roomNumber ASC
           `;
         }
-
-        const advancePaymentsResult = await db.sql`
+        let advancePaymentsResult = null;
+        if (status === 'advance') {
+          advancePaymentsResult = await db.sql`
+                SELECT
+                  booking_id,
+                  COALESCE(SUM(advance_amount), 0) AS advance_payment
+                FROM booking_payments
+                WHERE DATE(date) >= ${fromDate}
+                AND DATE(date) <= ${toDate}
+                GROUP BY booking_id
+              `;
+        } else {
+          advancePaymentsResult = await db.sql`
               SELECT 
                 booking_id,
                 COALESCE(SUM(advance_amount), 0) AS advance_payment
               FROM booking_payments
-              GROUP BY booking_id
+              GROUP BY booking_id 
             `;
+        }
 
         // Convert advance payments into a lookup map
         const advancePaymentsMap = {};
@@ -308,7 +359,9 @@ export default defineEventHandler(async (event) => {
             checkoutPayment: parseFloat(row.checkout_payment),
             totalDays: totalDays,
             totalRent: totalRent,
-            totalAdvance: !row.checkOutTime ? advance1 + advance2 : 0,
+            totalAdvance: advance1 + advance2,
+            initAdvance: advance1,
+            afterAdvance: advance2,
             payment: row.init_advance_payment,
             received: row.checkOutTime ? received : 0,
             amenities: parseFloat(row.amenities)

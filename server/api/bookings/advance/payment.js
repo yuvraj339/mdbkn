@@ -25,7 +25,6 @@ export default defineEventHandler(async (event) => {
 
   if (event.node.req.method === 'POST') {
     const { advanceAmount, bookingId, roomNumber, receiptNo, date } = await readBody(event);
-    console.log('advanceAmount', advanceAmount, bookingId, roomNumber, receiptNo, date);
     const statement = db.prepare(`INSERT INTO booking_payments (advance_amount, booking_id, room_number, receipt_no, date) VALUES (?, ?, ?, ?, ?)`);
     const result = statement.run(advanceAmount, bookingId, roomNumber, receiptNo, date);
     return result.changes > 0 ? { success: true, message: 'Record inserted successfully' } : { success: false, message: 'Record not found or update failed' };
@@ -39,7 +38,6 @@ export default defineEventHandler(async (event) => {
     }
     const statement = db.prepare(`DELETE FROM booking_payments WHERE id = ?`);
     const result = statement.run(payment_id);
-    console.log('Delete Result:', result);
     // if (result.changes > 0) {
     return { success: true, message: 'Record deleted successfully' };
     // } else {
