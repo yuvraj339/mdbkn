@@ -239,6 +239,11 @@ async function roomCategoryDetails() {
 }
 const getCategoryRooms = (category) => {
   rooms.value = roomDB.value.filter((room) => room.roomCategory == category);
+  if (category == 9 || category == 10) {
+    form.value.payment = 2000; // Reset payment for specific categories
+  } else {
+    form.value.payment = 1000; // Set default payment for other categories
+  }
   // console.log('Rooms:', rooms);
 };
 let imgHrf = ref('#img1');
