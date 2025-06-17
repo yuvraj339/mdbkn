@@ -71,6 +71,9 @@ function updateHeader() {
     } else {
       headers.value = headers.value.filter((header) => header.key !== 'received');
     }
+    if (status == 'advance') {
+      headers.value.push({ key: 'todayAdvance', label: 'Today Adv' });
+    }
   } else {
     headers.value.push(
       { key: 'mobile', label: 'Mobile' },

@@ -281,7 +281,9 @@ export default defineEventHandler(async (event) => {
           advancePaymentsResult = await db.sql`
                 SELECT
                   booking_id,
-                  COALESCE(SUM(advance_amount), 0) AS advance_payment
+                  COALESCE(SUM(advance_amount), 0) AS advance_payment,
+                  advance_amount AS today_advance,
+                  date
                 FROM booking_payments
                 WHERE DATE(date) >= ${fromDate}
                 AND DATE(date) <= ${toDate}
@@ -291,6 +293,8 @@ export default defineEventHandler(async (event) => {
           advancePaymentsResult = await db.sql`
               SELECT 
                 booking_id,
+                advance_amount AS today_advance,
+                date,
                 COALESCE(SUM(advance_amount), 0) AS advance_payment
               FROM booking_payments
               GROUP BY booking_id 
@@ -298,9 +302,11 @@ export default defineEventHandler(async (event) => {
         }
 
         // Convert advance payments into a lookup map
+        let todayAdvance = {};
         const advancePaymentsMap = {};
         advancePaymentsResult.rows.forEach((row) => {
           advancePaymentsMap[row.booking_id] = parseFloat(row.advance_payment);
+          todayAdvance[row.booking_id] = parseFloat(row.today_advance);
         });
         // console.log('advancePaymentsMap', advancePaymentsResult);
         // 3. Process rows
@@ -339,6 +345,7 @@ export default defineEventHandler(async (event) => {
           const totalRent = totalDays * row.daily_rent + parseFloat(row.amenities || 0);
           const advance1 = parseFloat(row.init_advance_payment || 0);
           const advance2 = advancePaymentsMap[row.id] || 0;
+          const today_advance = todayAdvance[row.id] || 0;
           console.log(advance1, advance2);
           const received = totalRent - (advance1 + advance2);
 
@@ -364,7 +371,8 @@ export default defineEventHandler(async (event) => {
             afterAdvance: advance2,
             payment: row.init_advance_payment,
             received: row.checkOutTime ? received : 0,
-            amenities: parseFloat(row.amenities)
+            amenities: parseFloat(row.amenities),
+            todayAdvance: today_advance
           };
         });
 
