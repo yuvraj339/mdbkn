@@ -206,7 +206,6 @@ export default defineEventHandler(async (event) => {
             ORDER BY r.roomNumber ASC
           `;
         } else if (status === 'advance') {
-          console.log(status, fromDate, toDate, 'data');
           bookingResult = await db.sql`
                             SELECT
                               b.id,
@@ -244,6 +243,42 @@ export default defineEventHandler(async (event) => {
                             ORDER BY r.roomNumber ASC
                           `;
           // return { rows: bookingResult.rows };
+        } else if (status === 'dayBook') {
+          bookingResult = await db.sql`
+                            SELECT
+                              b.id,
+                              b.patientName,
+                              b.guestName,
+                              b.mobile,
+                              b.patientType,
+                              b.checkInTime,
+                              b.checkOutTime,
+                              b.booking_receipt_number,
+                              b.amenities,
+                              r.roomNumber,
+                              rc.name AS roomCategory,
+                              CASE 
+                                WHEN b.patientType = 'cancer' THEN rc.patientRent
+                                ELSE rc.normalRent
+                              END AS daily_rent,
+                              b.payment AS init_advance_payment,
+                              b.checkout_payment,
+                              CONCAT_WS(', ', b.village, b.tehsil, b.city, b.state) AS address
+                            FROM bookings b
+                            JOIN rooms r ON b.room = r.id
+                            JOIN room_category rc ON r.roomCategory = rc.id
+                            LEFT JOIN (
+                              SELECT DISTINCT booking_id
+                              FROM booking_payments
+                              WHERE strftime('%Y-%m-%d', date) BETWEEN ${fromDate} AND ${toDate}
+                            ) ap ON ap.booking_id = b.id
+                            WHERE (
+                                DATE(b.checkInTime) BETWEEN ${fromDate} AND ${toDate}
+                                OR ap.booking_id IS NOT NULL
+                              )
+                              AND r.roomStatus = 'Unavailable'
+                            ORDER BY r.roomNumber ASC
+                          `;
         } else {
           bookingResult = await db.sql`
             SELECT 
@@ -277,7 +312,7 @@ export default defineEventHandler(async (event) => {
           `;
         }
         let advancePaymentsResult = null;
-        if (status === 'advance') {
+        if (status === 'advance' || status == 'dayBook') {
           advancePaymentsResult = await db.sql`
                 SELECT
                   booking_id,

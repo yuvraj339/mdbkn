@@ -74,6 +74,7 @@ function setFilter() {
             <option key="unavailable" value="Unavailable">Check-in</option>
             <option key="available" value="Available">Check-out</option>
             <option key="advance" value="advance">Check-in + Advance</option>
+            <option key="dayBook" value="dayBook">Day Book</option>
             <!-- <option v-for="option in field.options" :key="option.id" :value="option.id">{{ option.name }}</option> -->
           </select>
         </div>

@@ -316,7 +316,7 @@ function print() {
                   ? '<th>Total Advance</th><th>Received</th>'
                   : '<th>Total Advance</th>'
               }
-              ${type === 'cashBook' && status === 'advance' ? '<th>Today Adv</th>' : ''}
+              ${type === 'cashBook' && (status === 'advance' || status == 'dayBook') ? '<th>Today Adv</th>' : ''}
               
             </tr>
           </thead>
@@ -341,7 +341,7 @@ function print() {
                     ? `<td>${record.totalAdvance}</td><td>${record.received}</td>`
                     : `<td>${record.totalAdvance}</td>`;
 
-                if (type === 'cashBook' && status === 'advance') {
+                if (type === 'cashBook' && (status === 'advance' || status == 'dayBook')) {
                   return `<tr>${commonCols}${conditionalCols}${additionalCols}<td>${record.todayAdvance}</td></tr>`;
                 } else {
                   return `<tr>${commonCols}${conditionalCols}${additionalCols}</tr>`;

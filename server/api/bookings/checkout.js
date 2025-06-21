@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
               JOIN room_category rc ON r.roomCategory = rc.id
             WHERE r.roomStatus = 'Available'
               AND b.checkOutTime IS NOT NULL
-            ORDER BY b.checkOutTime DESC
+            ORDER BY b.id DESC
           `;
 
     const advancePaymentsResult = await db.sql`
