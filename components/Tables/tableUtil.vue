@@ -351,7 +351,7 @@ function print() {
           </tbody>
         </table>
       </body>
-    </html>
+    </html> 
   `;
 
   printWindow.document.write(tableHTML);
