@@ -312,7 +312,7 @@ function print() {
               ${
                 type !== 'dueBalance' && type !== 'cashBook'
                   ? '<th>Ward No</th>'
-                  : status === 'both' || status === 'Available'
+                  : status === 'both' || status === 'Available' || status == 'dayBook'
                   ? '<th>Total Advance</th><th>Received</th>'
                   : '<th>Total Advance</th>'
               }
@@ -337,7 +337,7 @@ function print() {
                 const additionalCols =
                   type !== 'dueBalance' && type !== 'cashBook'
                     ? `<td>${record.wardNo}</td>`
-                    : status === 'both' || status === 'Available'
+                    : status === 'both' || status === 'Available' || status == 'dayBook'
                     ? `<td>${record.totalAdvance}</td><td>${record.received}</td>`
                     : `<td>${record.totalAdvance}</td>`;
 

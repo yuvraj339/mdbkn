@@ -74,6 +74,9 @@ function updateHeader() {
     if (status == 'advance' || status == 'dayBook') {
       headers.value.push({ key: 'todayAdvance', label: 'Today Adv' });
     }
+    if (status == 'dayBook') {
+      headers.value.push({ key: 'received', label: 'Received' });
+    }
   } else {
     headers.value.push(
       { key: 'mobile', label: 'Mobile' },
