@@ -270,13 +270,13 @@ export default defineEventHandler(async (event) => {
                             LEFT JOIN (
                               SELECT DISTINCT booking_id
                               FROM booking_payments
-                              WHERE strftime('%Y-%m-%d', date) BETWEEN ${fromDate} AND ${toDate}
+                              WHERE DATE(date) BETWEEN ${fromDate} AND ${toDate}
                             ) ap ON ap.booking_id = b.id
                             WHERE (
                                 DATE(b.checkInTime) BETWEEN ${fromDate} AND ${toDate}
+                                OR DATE(b.checkOutTime) BETWEEN ${fromDate} AND ${toDate}
                                 OR ap.booking_id IS NOT NULL
-                              )
-                              AND r.roomStatus = 'Unavailable'
+                            )
                             ORDER BY r.roomNumber ASC
                           `;
         } else {
