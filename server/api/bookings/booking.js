@@ -111,7 +111,6 @@ export default defineEventHandler(async (event) => {
         advancePaymentsResult.rows.forEach((row) => {
           advancePaymentsMap[row.booking_id] = parseFloat(row.advance_payment);
         });
-        console.log('advancePaymentsMap', advancePaymentsResult);
         // 3. Process rows
         const today = new Date();
         const rows = bookingResult.rows.map((row) => {
@@ -343,7 +342,6 @@ export default defineEventHandler(async (event) => {
           advancePaymentsMap[row.booking_id] = parseFloat(row.advance_payment);
           todayAdvance[row.booking_id] = parseFloat(row.today_advance);
         });
-        // console.log('advancePaymentsMap', advancePaymentsResult);
         // 3. Process rows
         let allAdvance = 0;
         let allReceived = 0;
@@ -381,12 +379,25 @@ export default defineEventHandler(async (event) => {
           const advance1 = parseFloat(row.init_advance_payment || 0);
           const advance2 = advancePaymentsMap[row.id] || 0;
           const today_advance = todayAdvance[row.id] || 0;
-          console.log(advance1, advance2);
           const received = totalRent - (advance1 + advance2);
 
-          allAdvance += !row.checkOutTime ? parseFloat(advance1) + parseFloat(advance2) : 0;
-          allReceived += row.checkOutTime ? parseFloat(received) : 0;
+          if (status == 'dayBook') {
+            const checkInDate1 = new Date(row.checkInTime).toISOString().slice(0, 10); // Format to YYYY-MM-DD
+            const CheckingMatch = checkInDate1 === fromDate || checkInDate1 === toDate;
+
+            if (CheckingMatch) {
+              allAdvance += parseFloat(advance1);
+            }
+            if (parseFloat(advance2) > 0) {
+              allAdvance += parseFloat(advance2);
+            }
+          } else {
+            allAdvance += !row.checkOutTime ? parseFloat(advance1) + parseFloat(advance2) : 0;
+          }
+
           allTotalRent += parseFloat(totalRent);
+          allReceived += row.checkOutTime ? parseFloat(received) : 0;
+
           return {
             id: row.id,
             patientName: row.patientName,
@@ -459,8 +470,6 @@ export default defineEventHandler(async (event) => {
     updateRoomStatus(fields.room, 'Unavailable');
 
     // Log fields and upload path to confirm data parsing
-    // console.log('Parsed Fields:', fields);
-    // console.log('Upload Path:', uploadPath);
     try {
       // Prepare insert statement
       const statement = db.prepare(`
@@ -503,7 +512,6 @@ export default defineEventHandler(async (event) => {
         fields.booking_receipt_number || null
       );
 
-      // console.log('Insert Result:', result);
       return { success: true, id: result.lastInsertRowid };
     } catch (error) {
       console.error('Database Insert Error:', error);
