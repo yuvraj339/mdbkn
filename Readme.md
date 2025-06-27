@@ -4,7 +4,7 @@
 
 ## if not work try "npm rebuild"
 
-npm run dev
+npm run dev will work
 
 ### npm run dev:electron:win
 
