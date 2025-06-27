@@ -18,7 +18,7 @@ debug.json
 errors.json
 .data/db.sqlite3
 public/uploads/*
-modified:   .gitignore
+.gitignore
 package-lock.json
 yarn.lock
 
