@@ -17,3 +17,9 @@ debug.log
 debug.json
 errors.json
 .data/db.sqlite3
+public/uploads/*
+modified:   .gitignore
+package-lock.json
+yarn.lock
+
+ 
