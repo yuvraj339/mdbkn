@@ -295,7 +295,7 @@ function print() {
           ${
             type === 'cashBook' && other.value != null
               ? `<div class="summary">
-                  <span><strong>Total Advance:</strong> ${other.value.allAdvance}</span>
+                  <span><strong>Today Advance:</strong> ${other.value.allAdvance}</span>
                   <span><strong>Payment Received on Checkout:</strong> ${other.value.allReceived}</span>
                 </div>`
               : ''
