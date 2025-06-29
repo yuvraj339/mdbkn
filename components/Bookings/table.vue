@@ -75,7 +75,9 @@ function updateHeader() {
       headers.value.push({ key: 'todayAdvance', label: 'Today Adv' });
     }
     if (status === 'dayBook') {
+      headers.value.push({ key: 'totalAdvance_table', label: 'Advance' });
       headers.value.push({ key: 'received', label: 'Received' });
+      headers.value = headers.value.filter((header) => header.key !== 'totalAdvance');
     }
   } else {
     headers.value.push(

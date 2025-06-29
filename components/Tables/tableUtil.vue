@@ -337,12 +337,15 @@ function print() {
                 const additionalCols =
                   type !== 'dueBalance' && type !== 'cashBook'
                     ? `<td>${record.wardNo}</td>`
-                    : status === 'both' || status === 'Available' || status == 'dayBook'
+                    : status === 'both' || status === 'Available'
                     ? `<td>${record.totalAdvance}</td><td>${record.received}</td>`
-                    : `<td>${record.totalAdvance}</td>`;
+                    : '';
+
+                const dayBookCols =
+                  type === 'cashBook' && status == 'dayBook' ? `<td>${record.totalAdvance_table}</td><td>${record.received}</td>` : `<td>${record.totalAdvance}</td>`;
 
                 if (type === 'cashBook' && (status === 'advance' || status == 'dayBook')) {
-                  return `<tr>${commonCols}${conditionalCols}${additionalCols}<td>${record.todayAdvance}</td></tr>`;
+                  return `<tr>${commonCols}${conditionalCols}${additionalCols}${dayBookCols}<td>${record.todayAdvance}</td></tr>`;
                 } else {
                   return `<tr>${commonCols}${conditionalCols}${additionalCols}</tr>`;
                 }

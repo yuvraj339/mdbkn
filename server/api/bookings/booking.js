@@ -334,10 +334,25 @@ export default defineEventHandler(async (event) => {
               GROUP BY booking_id 
             `;
         }
+        const advancePaymentsResult1 = await db.sql`
+                SELECT
+                  booking_id,
+                  COALESCE(SUM(advance_amount), 0) AS advance_payment,
+                  advance_amount AS today_advance,
+                  date
+                FROM booking_payments
 
+                GROUP BY booking_id
+              `;
         // Convert advance payments into a lookup map
         let todayAdvance = {};
         const advancePaymentsMap = {};
+        const advancePayments1Map = {};
+
+        advancePaymentsResult1.rows.forEach((row) => {
+          advancePayments1Map[row.booking_id] = parseFloat(row.advance_payment);
+        });
+
         advancePaymentsResult.rows.forEach((row) => {
           advancePaymentsMap[row.booking_id] = parseFloat(row.advance_payment);
           todayAdvance[row.booking_id] = parseFloat(row.today_advance);
@@ -378,10 +393,16 @@ export default defineEventHandler(async (event) => {
           const totalRent = totalDays * row.daily_rent + parseFloat(row.amenities || 0);
           const advance1 = parseFloat(row.init_advance_payment || 0);
           const advance2 = advancePaymentsMap[row.id] || 0;
+          const totalAdvance_1 = advancePayments1Map[row.id] || 0;
           const today_advance = todayAdvance[row.id] || 0;
-          const received = totalRent - (advance1 + advance2);
-
+          let received = totalRent - (advance1 + advance2);
           if (status == 'dayBook') {
+            received = totalRent - (advance1 + totalAdvance_1);
+          }
+
+          let totalAdvance_table = advance1 + advance2;
+          if (status == 'dayBook') {
+            totalAdvance_table = advance1 + totalAdvance_1;
             const checkInDate1 = new Date(row.checkInTime).toISOString().slice(0, 10); // Format to YYYY-MM-DD
             const CheckingMatch = checkInDate1 === fromDate || checkInDate1 === toDate;
 
@@ -412,6 +433,7 @@ export default defineEventHandler(async (event) => {
             checkoutPayment: parseFloat(row.checkout_payment),
             totalDays: totalDays,
             totalRent: totalRent,
+            totalAdvance_table: totalAdvance_table,
             totalAdvance: advance1 + advance2,
             initAdvance: advance1,
             afterAdvance: advance2,
